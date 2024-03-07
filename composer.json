@@ -1,0 +1,24 @@
+{
+    "autoload": {
+        "psr-4": {
+            "Models\\": "src/models/",
+            "Controllers:\\": "src/controllers/"
+        }
+    },
+    "authors": [
+        {
+            "name": "Corax73",
+            "email": "ramaz999@inbox.ru"
+        }
+    ],
+    "require-dev": {
+        "phpunit/phpunit": "^9.6",
+        "codeception/codeception": "^5.0",
+        "codeception/module-phpbrowser": "*",
+        "codeception/module-asserts": "*",
+        "symfony/var-dumper": "^7.0"
+    },
+    "require": {
+        "pecee/simple-router": "5.4.1.7"
+    }
+}
