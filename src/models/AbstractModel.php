@@ -2,9 +2,9 @@
 
 namespace Models;
 
-use Connect;
+use Models\Connect;
 
-class AbstractModel
+abstract class AbstractModel
 {
     protected Connect $connect;
 

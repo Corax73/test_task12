@@ -1,11 +1,10 @@
 <?php
 
+use Controllers\AuthController;
 use Pecee\SimpleRouter\SimpleRouter;
 
 SimpleRouter::group(['prefix' => 'api'], function () {
-    SimpleRouter::get('/', function() {
-        return 'Stub';
-    })->name('main');
+    SimpleRouter::post('/login', [AuthController::class, 'login'])->name('main');
 });
 
 SimpleRouter::router()->loadRoutes();
