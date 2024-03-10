@@ -5,6 +5,10 @@ namespace Controllers;
 use Pecee\SimpleRouter\SimpleRouter;
 use Pecee\Http\Response;
 
+/**
+ * @property \Pecee\Http\Request $request
+ * @property \Pecee\Http\Response $response
+ */
 abstract class AbstractController
 {
     protected $response;
