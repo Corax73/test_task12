@@ -13,7 +13,17 @@ abstract class AbstractModel
     protected string $table;
     protected Connect $connect;
 
-    public function __construct() {
+    public function __construct()
+    {
         $this->connect = new Connect;
+    }
+
+    /**
+     * Returns the name of the model table.
+     * @return string
+     */
+    public function getTable(): string
+    {
+        return $this->table;
     }
 }

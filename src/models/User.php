@@ -2,6 +2,8 @@
 
 namespace Models;
 
+use PDO;
+
 /**
  * @property string $table
  * @property array $fillable
@@ -22,16 +24,62 @@ class User extends AbstractModel
      */
     public function save(string $email, string $password): bool
     {
-        $query = 'INSERT INTO ' . $this->table . ' (email, password, created_at) VALUES (:email, :check_id, :now)';
+        $resp = false;
+        $strFields = implode(', ', $this->fillable);
+        if ($strFields) {
+            $query = 'INSERT INTO ' . $this->table . ' (email, password, created_at) VALUES (:email, :password, :now)';
 
-        $password = password_hash($password, PASSWORD_DEFAULT);
+            $password = password_hash($password, PASSWORD_DEFAULT);
 
+            $params = [
+                ':email' => $email,
+                ':password' => $password,
+                ':now' => date('Y-m-d h:i:s', time())
+            ];
+            $stmt = $this->connect->connect(PATH_CONF)->prepare($query);
+            $resp = $stmt->execute($params);
+        }
+        return $resp;
+    }
+
+    /**
+     * User authentication check.
+     * @param string $email
+     * @param string $password
+     * @return bool
+     */
+    public function authUser(string $email, string $password): bool
+    {
+        $resp = false;
+        $query = "SELECT * FROM `users` WHERE email = :email";
         $params = [
-            ':email' => $email,
-            ':check_id' => $password,
-            ':now' => date('Y-m-d h:i:s', time())
+            ':email' => $email
         ];
         $stmt = $this->connect->connect(PATH_CONF)->prepare($query);
-        return $stmt->execute($params);
+        $stmt->execute($params);
+        $row = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        if (count($row) == 1) {
+            if (password_verify($password, $row[0]['password'])) {
+                $resp = true;
+            }
+        }
+        return $resp;
+    }
+
+    /**
+     * Loading token of one user.
+     * @param string $email
+     * @return string
+     */
+    public function getToken(string $email): string
+    {
+        $query = 'SELECT `remember_token` FROM ' . $this->table . ' WHERE `email` = :email';
+        $params = [
+            ':email' => $email
+        ];
+        $stmt = $this->connect->connect(PATH_CONF)->prepare($query);
+        $stmt->execute($params);
+        $token = $stmt->fetchAll(PDO::FETCH_ASSOC)[0]['remember_token'];
+        return $token;
     }
 }

@@ -2,18 +2,11 @@
 
 namespace Service;
 
-use Models\Connect;
 use PDO;
 
-class RequestDataCheck
+class RequestDataCheck extends AbstractService
 {
-    protected Connect $connect;
     protected int $minLengthPassword = 8;
-
-    public function __construct()
-    {
-        $this->connect = new Connect;
-    }
 
     /**
      * Checking the entered email for uniqueness.

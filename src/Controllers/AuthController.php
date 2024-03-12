@@ -5,12 +5,23 @@ namespace Controllers;
 use Models\User;
 use Pecee\Http\Response;
 use Service\RequestDataCheck;
+use Service\TokenSetter;
 
 class AuthController extends AbstractController
 {
+    /**
+     * Checks the email and password from the request. If successful, returns the user token.
+     * @return Pecee\Http\Response
+     */
     public function login(): Response
     {
-        return $this->response->json($this->request->getInputHandler()->getOriginalPost());
+        $user = new User();
+        $data = $this->request->getInputHandler()->getOriginalPost();
+        $auth = $user->authUser($data['email'], $data['password']);
+        if($auth) {
+            $token = $user->getToken($data['email']);
+        }
+        return $this->response->json(['token' => $token]);
     }
 
     /**
@@ -26,7 +37,12 @@ class AuthController extends AbstractController
             if ($check->checkEmailUniqueness($data['email'])) {
                 if ($check->checkingPassword($data['password'])) {
                     $user = new User();
-                    $resp = $user->save($data['email'], $data['password']) ? 'User created.' : $resp;
+                    $result = $user->save($data['email'], $data['password']);
+                    if($result) {
+                        $tokenSetter = new TokenSetter();
+                        $tokenSetter->setToken($data['email']);
+                    }
+                    $resp = $result ? 'User created.' : $resp;
                 } else {
                     $resp = 'Invalid characters in the password or shorter than 8 characters.';
                 }
