@@ -27,7 +27,7 @@ class User extends AbstractModel
         $resp = false;
         $strFields = implode(', ', $this->fillable);
         if ($strFields) {
-            $query = 'INSERT INTO ' . $this->table . ' (email, password, created_at) VALUES (:email, :password, :now)';
+            $query = 'INSERT INTO `' . $this->table . '` (' . $strFields . ', created_at) VALUES (:email, :password, :now)';
 
             $password = password_hash($password, PASSWORD_DEFAULT);
 

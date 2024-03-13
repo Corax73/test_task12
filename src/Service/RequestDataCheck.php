@@ -47,4 +47,25 @@ class RequestDataCheck extends AbstractService
         }
         return $resp;
     }
+
+    /**
+     * Checking the entered title for uniqueness.
+     * @param string $title
+     * @return bool
+     */
+    public function checkGroupTitleUniqueness(string $title): bool
+    {
+        $query = "SELECT * FROM `groups` WHERE title = :title";
+        $params = [
+            ':title' => $title
+        ];
+        $stmt = $this->connect->connect(PATH_CONF)->prepare($query);
+        $stmt->execute($params);
+        $row = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        if (count($row) > 0) {
+            return false;
+        } else {
+            return true;
+        }
+    }
 }
