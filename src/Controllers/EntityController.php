@@ -7,6 +7,11 @@ use Service\RequestDataCheck;
 
 class EntityController extends AbstractController
 {
+    /**
+     * Creates a model-entity when a class exists with an argument-string in its name.
+     * @param string $target
+     * @return Pecee\Http\Response
+     */
     public function create(string $target): Response
     {
         $resp = 'error';
