@@ -17,7 +17,7 @@ class RightsController extends AbstractController
         $resp = 'error';
         $result = false;
         $data = $this->request->getInputHandler()->getOriginalPost();
-        if ($data['group_id'] && $data['right']) {
+        if (isset($data['group_id']) && isset($data['right'])) {
             $group = new Group();
             if ($group->find($data['group_id'])) {
                 $declaredRights = collect(ListRights::cases())->map(fn($item) => $item->value)->toArray();

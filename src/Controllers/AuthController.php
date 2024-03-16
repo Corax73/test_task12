@@ -18,7 +18,7 @@ class AuthController extends AbstractController
         $user = new User();
         $data = $this->request->getInputHandler()->getOriginalPost();
         $auth = $user->authUser($data['email'], $data['password']);
-        if($auth) {
+        if ($auth) {
             $token = $user->getToken($data['email']);
         }
         return $this->response->json(['token' => $token]);
@@ -32,25 +32,27 @@ class AuthController extends AbstractController
     {
         $resp = 'error';
         $data = $this->request->getInputHandler()->getOriginalPost();
-        if ($data['password'] == $data['password_confirm']) {
-            $check = new RequestDataCheck();
-            if ($check->checkEmailUniqueness($data['email'])) {
-                if ($check->checkingPassword($data['password'])) {
-                    $user = new User();
-                    $result = $user->save($data['email'], $data['password']);
-                    if($result) {
-                        $tokenSetter = new TokenSetter();
-                        $tokenSetter->setToken($data['email']);
+        if (isset($data['email']) && isset($data['password']) && isset($data['password_confirm'])) {
+            if ($data['password'] == $data['password_confirm']) {
+                $check = new RequestDataCheck();
+                if ($check->checkEmailUniqueness($data['email'])) {
+                    if ($check->checkingPassword($data['password'])) {
+                        $user = new User();
+                        $result = $user->save($data['email'], $data['password']);
+                        if ($result) {
+                            $tokenSetter = new TokenSetter();
+                            $tokenSetter->setToken($data['email']);
+                        }
+                        $resp = $result ? 'User created.' : $resp;
+                    } else {
+                        $resp = 'Invalid characters in the password or shorter than 8 characters.';
                     }
-                    $resp = $result ? 'User created.' : $resp;
                 } else {
-                    $resp = 'Invalid characters in the password or shorter than 8 characters.';
+                    $resp = 'Email is not unique!';
                 }
             } else {
-                $resp = 'Email is not unique!';
+                $resp = 'Password mismatch.';
             }
-        } else {
-            $resp = 'Password mismatch.';
         }
         return $this->response->json(['response' => $resp]);
     }

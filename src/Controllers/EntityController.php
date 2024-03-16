@@ -19,7 +19,7 @@ class EntityController extends AbstractController
         $className = 'Models\\' . ucfirst($target);
         if (class_exists($className)) {
             $data = $this->request->getInputHandler()->getOriginalPost();
-            if ($data['title']) {
+            if (isset($data['title'])) {
                 $check = new RequestDataCheck();
                 if ($check->checkGroupTitleUniqueness($data['title'])) {
                     $entity = new $className();
