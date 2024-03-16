@@ -29,4 +29,17 @@ class Group extends AbstractModel
         }
         return $resp;
     }
+
+    /**
+     * Returns an array of its rights received from the Group model by ID, if available.
+     * @param int $id
+     * @return array
+     */
+    public function rights(int $id): array
+    {
+        $groupRights = new GroupRights();
+        $rights = $groupRights->getRights($id);
+        $resp = $rights ? $rights : [];
+        return $resp;
+    }
 }

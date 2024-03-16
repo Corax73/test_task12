@@ -10,6 +10,7 @@ SimpleRouter::group(['prefix' => 'api'], function () {
     SimpleRouter::post('/registration', [AuthController::class, 'registration'])->name('registration');
     SimpleRouter::post('/create/{target}', [EntityController::class, 'create'])->name('createEntity');
     SimpleRouter::post('/rights/', [RightsController::class, 'create'])->name('setGroupRights');
+    SimpleRouter::get('/rights/{id}', [RightsController::class, 'show'])->name('getGroupRights');
 });
 
 SimpleRouter::router()->loadRoutes();
