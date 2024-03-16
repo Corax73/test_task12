@@ -3,7 +3,8 @@
         "psr-4": {
             "Models\\": "src/Models/",
             "Controllers\\": "src/Controllers/",
-            "Service\\": "src/Service"
+            "Service\\": "src/Service",
+            "Enums\\": "src/Enums"
         }
     },
     "authors": [
@@ -20,6 +21,7 @@
         "symfony/var-dumper": "^7.0"
     },
     "require": {
-        "pecee/simple-router": "5.4.1.7"
+        "pecee/simple-router": "5.4.1.7",
+        "illuminate/collections": "^11.0"
     }
 }

@@ -2,6 +2,7 @@
 
 namespace Controllers;
 
+use Enums\ListRights;
 use Models\Group;
 use Models\GroupRights;
 
@@ -19,8 +20,11 @@ class RightsController extends AbstractController
         if ($data['group_id'] && $data['right']) {
             $group = new Group();
             if ($group->find($data['group_id'])) {
-                $groupRights = new GroupRights();
-                $result = $groupRights->save($data['group_id'], $data['right']);
+                $declaredRights = collect(ListRights::cases())->map(fn($item) => $item->value)->toArray();
+                if ($declaredRights && in_array($data['right'], $declaredRights)) {
+                    $groupRights = new GroupRights();
+                    $result = $groupRights->save($data['group_id'], $data['right']);
+                }
             }
         }
         $resp = $result ? 'right settled' : $resp;
