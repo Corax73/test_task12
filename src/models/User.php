@@ -82,4 +82,24 @@ class User extends AbstractModel
         $token = $stmt->fetchAll(PDO::FETCH_ASSOC)[0]['remember_token'];
         return $token;
     }
+
+    /**
+     * Returns an array of user rights by his ID through a subquery of group membership.
+     * @param int $id
+     * @return array
+     */
+    public function getRights(int $id): array
+    {
+        $groupRights = new GroupRights();
+        $userMembership = new UserMembership();
+        $query = 'SELECT `right_name` FROM ' . $groupRights->getTable() . ' WHERE `group_id` = (SELECT `group_id` FROM ' . $userMembership->getTable()
+        . ' WHERE `user_id` = :id LIMIT 1)';
+        $params = [
+            ':id' => $id
+        ];
+        $stmt = $this->connect->connect(PATH_CONF)->prepare($query);
+        $stmt->execute($params);
+        $resp = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        return $resp ? $resp : [];
+    }
 }

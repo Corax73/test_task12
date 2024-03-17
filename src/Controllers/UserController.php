@@ -5,6 +5,7 @@ namespace Controllers;
 use Models\Group;
 use Models\User;
 use Models\UserMembership;
+use Pecee\Http\Response;
 
 class UserController extends AbstractController
 {
@@ -39,6 +40,23 @@ class UserController extends AbstractController
         $userMembership = new UserMembership();
         $userGroups = $userMembership->memberships($id);
         $resp = $userGroups ? $userGroups : ['response' => 'User group membership not found.'];
+        return $this->response->json($resp);
+    }
+
+    /**
+     * Gets rights from the user by his ID.
+     * @param int $id
+     * @return Pecee\Http\Response
+     */
+    public function showUsersRights(int $id): Response
+    {
+        $resp = 'error';
+        $result = false;
+        $user = new User();
+        if ($user->find($id)) {
+            $result = $user->getRights($id);
+            $resp = $result ? $result : ['response' => 'User rights not found.'];
+        }
         return $this->response->json($resp);
     }
 }

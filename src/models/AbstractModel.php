@@ -47,10 +47,15 @@ abstract class AbstractModel
 
     public function all(int $limit = 12, int $offset = 0): array
     {
-        $query = 'SELECT * FROM `' . $this->table . '` LIMIT :limit OFFSET :offset';
+        $query = 'SELECT * FROM `' . $this->table . '` LIMIT :limit';
+        if ($offset) {
+            $query .= ' OFFSET :offset';
+        }
         $stmt = $this->connect->connect(PATH_CONF)->prepare($query);
-        $stmt->bindValue(':limit', (int) $limit, PDO::PARAM_INT);
-        $stmt->bindValue(':offset', (int) $offset, PDO::PARAM_INT);
+        $stmt->bindValue(':limit', $limit, PDO::PARAM_INT);
+        if ($offset) {
+            $stmt->bindValue(':offset', $offset, PDO::PARAM_INT);
+        }
         $stmt->execute();
         $resp = $stmt->fetchAll(PDO::FETCH_ASSOC);
         return $resp ? $resp : [];

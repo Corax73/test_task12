@@ -26,5 +26,6 @@ abstract class AbstractController
         $this->response->header('Access-Control-Request-Method: OPTIONS');
         $this->response->header('Access-Control-Allow-Credentials: true');
         $this->response->header('Access-Control-Max-Age: 3600');
+        $this->response->header('Content-Type: application/json');
     }
 }

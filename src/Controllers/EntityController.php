@@ -7,6 +7,8 @@ use Service\RequestDataCheck;
 
 class EntityController extends AbstractController
 {
+    protected int $perPage = 12;
+
     /**
      * Creates a model-entity when a class exists with an argument-string in its name.
      * @param string $target
@@ -44,7 +46,7 @@ class EntityController extends AbstractController
         if ($check->checkEntityExist($target)) {
             $className = 'Models\\' . ucfirst($target);
             $entity = new $className();
-            $result = $entity->all($offset);
+            $result = $entity->all($this->perPage, $offset);
         }
         return $this->response->json(['data' => $result ? $result : $resp]);
     }
