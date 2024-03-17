@@ -68,4 +68,19 @@ class RequestDataCheck extends AbstractService
             return true;
         }
     }
+
+    /**
+     * Checks the existence of an entity.
+     * @param string $target
+     * @return bool
+     */
+    public function checkEntityExist(string $target): bool
+    {
+        $resp = false;
+        $className = 'Models\\' . ucfirst($target);
+        if (class_exists($className)) {
+            $resp = true;
+        }
+        return $resp;
+    }
 }

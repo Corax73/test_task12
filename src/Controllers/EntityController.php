@@ -16,12 +16,12 @@ class EntityController extends AbstractController
     {
         $resp = 'error';
         $result = false;
-        $className = 'Models\\' . ucfirst($target);
-        if (class_exists($className)) {
+        $check = new RequestDataCheck();
+        if ($check->checkEntityExist($target)) {
             $data = $this->request->getInputHandler()->getOriginalPost();
             if (isset($data['title'])) {
-                $check = new RequestDataCheck();
                 if ($check->checkGroupTitleUniqueness($data['title'])) {
+                    $className = 'Models\\' . ucfirst($target);
                     $entity = new $className();
                     $result = $entity->save($data['title']);
                 }
@@ -29,5 +29,23 @@ class EntityController extends AbstractController
         }
         $resp = $result ? ucfirst($target) . ' created.' : $resp;
         return $this->response->json(['response' => $resp]);
+    }
+
+    /**
+     * @param string $target
+     * @param int $offset
+     * @return Pecee\Http\Response
+     */
+    public function index(string $target, int $offset = 0): Response
+    {
+        $resp = 'error';
+        $result = [];
+        $check = new RequestDataCheck();
+        if ($check->checkEntityExist($target)) {
+            $className = 'Models\\' . ucfirst($target);
+            $entity = new $className();
+            $result = $entity->all($offset);
+        }
+        return $this->response->json(['data' => $result ? $result : $resp]);
     }
 }
