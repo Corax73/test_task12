@@ -15,6 +15,7 @@ class User extends AbstractModel
         'email',
         'password'
     ];
+    protected array $guarded = ['password', 'remember_token'];
 
     /**
      * Save user data.
@@ -93,7 +94,7 @@ class User extends AbstractModel
         $groupRights = new GroupRights();
         $userMembership = new UserMembership();
         $query = 'SELECT `right_name` FROM ' . $groupRights->getTable() . ' WHERE `group_id` = (SELECT `group_id` FROM ' . $userMembership->getTable()
-        . ' WHERE `user_id` = :id LIMIT 1)';
+            . ' WHERE `user_id` = :id LIMIT 1)';
         $params = [
             ':id' => $id
         ];

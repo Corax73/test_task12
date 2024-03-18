@@ -33,13 +33,13 @@ class RightsController extends AbstractController
 
     /**
      * Returns an array of its rights received from the Group model by ID, if available.
-     * @param int $id
+     * @param int $group_id
      * @return Pecee\Http\Response
      */
-    public function show(int $id): Response
+    public function show(int $group_id): Response
     {
         $group = new Group();
-        $rights = $group->rights($id);
+        $rights = $group->rights($group_id);
         $resp = $rights ? $rights : ['response' => 'Rights not found.'];
         return $this->response->json($resp);
     }

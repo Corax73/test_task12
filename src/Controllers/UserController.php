@@ -32,29 +32,29 @@ class UserController extends AbstractController
 
     /**
      * Returns an array of user group IDs.
-     * @param int $id
+     * @param int $user_id
      * @return Pecee\Http\Response
      */
-    public function showUsersGroups(int $id): Response
+    public function showUsersGroups(int $user_id): Response
     {
         $userMembership = new UserMembership();
-        $userGroups = $userMembership->memberships($id);
+        $userGroups = $userMembership->memberships($user_id);
         $resp = $userGroups ? $userGroups : ['response' => 'User group membership not found.'];
         return $this->response->json($resp);
     }
 
     /**
      * Gets rights from the user by his ID.
-     * @param int $id
+     * @param int $user_id
      * @return Pecee\Http\Response
      */
-    public function showUsersRights(int $id): Response
+    public function showUsersRights(int $user_id): Response
     {
         $resp = 'error';
         $result = false;
         $user = new User();
-        if ($user->find($id)) {
-            $result = $user->getRights($id);
+        if ($user->find($user_id)) {
+            $result = $user->getRights($user_id);
             $resp = $result ? $result : ['response' => 'User rights not found.'];
         }
         return $this->response->json($resp);

@@ -11,6 +11,7 @@ class UserMembership extends AbstractModel
         'user_id',
         'group_id'
     ];
+    protected array $guarded = [];
 
     /**
      * Save the user's group membership.
@@ -50,5 +51,22 @@ class UserMembership extends AbstractModel
         $stmt->execute($params);
         $groupIds = $stmt->fetchAll(PDO::FETCH_ASSOC);
         return $groupIds;
+    }
+
+    /**
+     * Loading data by group_id.
+     * @param int $group_id
+     * @return string
+     */
+    public function users(int $group_id)
+    {
+        $query = 'SELECT `user_id` FROM ' . $this->table . ' WHERE `group_id` = :group_id';
+        $params = [
+            ':group_id' => $group_id
+        ];
+        $stmt = $this->connect->connect(PATH_CONF)->prepare($query);
+        $stmt->execute($params);
+        $usersIds = collect($stmt->fetchAll(PDO::FETCH_ASSOC))->map(fn($item) => $item['user_id'])->toArray();
+        return $usersIds;
     }
 }

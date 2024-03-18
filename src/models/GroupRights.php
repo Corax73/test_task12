@@ -12,6 +12,7 @@ class GroupRights extends AbstractModel
         'group_id',
         'right_name'
     ];
+    protected array $guarded = [];
 
     /**
      * Save group rights.

@@ -12,6 +12,8 @@ use PDO;
 abstract class AbstractModel
 {
     protected string $table;
+    protected array $fillable;
+    protected array $guarded;
     protected Connect $connect;
 
     public function __construct()
@@ -30,15 +32,21 @@ abstract class AbstractModel
 
     /**
      * Searches by model ID. Returns an array with data or false.
-     * @param int $id
+     * @param int|array $id
      * @return array | bool
      */
-    public function find(int $id): array | bool
+    public function find(int|array $id): array | bool
     {
-        $query = 'SELECT * FROM `' . $this->table . '` WHERE `id` = :id';
-        $params = [
-            ':id' => $id
-        ];
+        if (is_array($id)) {
+            $params = $id;
+            $placeholders = str_repeat('?, ',  count($id) - 1) . '?';
+            $query = "SELECT id, " . implode(', ', array_diff($this->fillable, $this->guarded)) . ",created_at FROM `$this->table` WHERE `id` IN ($placeholders)";
+        } else {
+            $query = 'SELECT id, ' . implode(', ', array_diff($this->fillable, $this->guarded)) . ',created_at FROM `' . $this->table . '` WHERE `id` = :id';
+            $params = [
+                ':id' => $id
+            ];
+        }
         $stmt = $this->connect->connect(PATH_CONF)->prepare($query);
         $stmt->execute($params);
         $resp = $stmt->fetchAll(PDO::FETCH_ASSOC);

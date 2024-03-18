@@ -8,6 +8,7 @@ class Group extends AbstractModel
     protected array $fillable = [
         'title'
     ];
+    protected array $guarded = [];
 
     /**
      * Save group data.
@@ -40,6 +41,19 @@ class Group extends AbstractModel
         $groupRights = new GroupRights();
         $rights = $groupRights->getRights($id);
         $resp = $rights ? $rights : [];
+        return $resp;
+    }
+
+    /**
+     * Returns an array ID of group users.
+     * @param int $group_id
+     * @return array
+     */
+    public function users(int $group_id): array
+    {
+        $userMembership = new UserMembership();
+        $users = $userMembership->users($group_id);
+        $resp = $users ? $users : [];
         return $resp;
     }
 }
