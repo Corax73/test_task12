@@ -15,7 +15,10 @@ class User extends AbstractModel
         'email',
         'password'
     ];
-    protected array $guarded = ['password', 'remember_token'];
+    protected array $guarded = [
+        'password',
+        'remember_token'
+    ];
 
     /**
      * Save user data.
@@ -74,13 +77,17 @@ class User extends AbstractModel
      */
     public function getToken(string $email): string
     {
+        $token = 'error';
         $query = 'SELECT `remember_token` FROM ' . $this->table . ' WHERE `email` = :email';
         $params = [
             ':email' => $email
         ];
         $stmt = $this->connect->connect(PATH_CONF)->prepare($query);
         $stmt->execute($params);
-        $token = $stmt->fetchAll(PDO::FETCH_ASSOC)[0]['remember_token'];
+        $resp = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        if (isset($resp[0]['remember_token'])) {
+            $token = $resp[0]['remember_token'];
+        }
         return $token;
     }
 
@@ -102,5 +109,25 @@ class User extends AbstractModel
         $stmt->execute($params);
         $resp = $stmt->fetchAll(PDO::FETCH_ASSOC);
         return $resp ? $resp : [];
+    }
+
+    /**
+     * Returns an array with the user's rights by his email.
+     * @param string $email
+     * @return array
+     */
+    public function getRightsByEmail(string $email): array
+    {
+        $groupRights = new GroupRights();
+        $userMembership = new UserMembership();
+        $query = 'SELECT `right_name` FROM `' . $groupRights->getTable() . '` WHERE `group_id` IN (SELECT `group_id` FROM `' . $userMembership->getTable()
+            . '` WHERE `user_id` = (SELECT `id` FROM `' . $this->getTable() . '` WHERE `email` = :email))';
+        $params = [
+            ':email' => $email
+        ];
+        $stmt = $this->connect->connect(PATH_CONF)->prepare($query);
+        $stmt->execute($params);
+        $resp = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        return $resp ? collect($resp)->flatten()->toArray() : [];
     }
 }
