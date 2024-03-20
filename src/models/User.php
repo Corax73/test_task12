@@ -93,8 +93,8 @@ class User extends AbstractModel
     {
         $groupRights = new GroupRights();
         $userMembership = new UserMembership();
-        $query = 'SELECT `right_name` FROM ' . $groupRights->getTable() . ' WHERE `group_id` = (SELECT `group_id` FROM ' . $userMembership->getTable()
-            . ' WHERE `user_id` = :id LIMIT 1)';
+        $query = 'SELECT `right_name` FROM ' . $groupRights->getTable() . ' WHERE `group_id` IN (SELECT `group_id` FROM ' . $userMembership->getTable()
+            . ' WHERE `user_id` = :id)';
         $params = [
             ':id' => $id
         ];
