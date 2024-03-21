@@ -2,6 +2,7 @@
 
 namespace Controllers;
 
+use Enums\Errors;
 use Models\User;
 use Pecee\Http\Response;
 use Service\RequestDataCheck;
@@ -15,13 +16,19 @@ class AuthController extends AbstractController
      */
     public function login(): Response
     {
+        $resp = ['errors' => [Errors::IncompleteData->value]];
         $user = new User();
         $data = $this->request->getInputHandler()->getOriginalPost();
-        $auth = $user->authUser($data['email'], $data['password']);
-        if ($auth) {
-            $token = $user->getToken($data['email']);
+        if (isset($data['email']) && isset($data['password'])) {
+            $auth = $user->authUser($data['email'], $data['password']);
+            if ($auth) {
+                $token = $user->getToken($data['email']);
+                $resp = ['token' => $token];
+            } else {
+                $resp = ['errors' => [Errors::Credentials->value]];
+            }
         }
-        return $this->response->json(['token' => $token]);
+        return $this->response->json($resp);
     }
 
     /**
@@ -30,7 +37,7 @@ class AuthController extends AbstractController
      */
     public function registration(): Response
     {
-        $resp = 'error';
+        $resp = ['errors' => [Errors::IncompleteData->value]];
         $data = $this->request->getInputHandler()->getOriginalPost();
         if (isset($data['email']) && isset($data['password']) && isset($data['password_confirm'])) {
             if ($data['password'] == $data['password_confirm']) {
@@ -43,17 +50,17 @@ class AuthController extends AbstractController
                             $tokenSetter = new TokenSetter();
                             $tokenSetter->setToken($data['email']);
                         }
-                        $resp = $result ? 'User created.' : $resp;
+                        $resp = $result ? ['response' => 'User created.'] : $resp;
                     } else {
-                        $resp = 'Invalid characters in the password or shorter than 8 characters.';
+                        $resp = ['errors' => ['Email ' . Errors::BadPassword->value]];
                     }
                 } else {
-                    $resp = 'Email is not unique!';
+                    $resp = ['errors' => ['Email ' . Errors::Unique->value]];
                 }
             } else {
-                $resp = 'Password mismatch.';
+                $resp = ['errors' => [Errors::ConfirmPassword->value]];;
             }
         }
-        return $this->response->json(['response' => $resp]);
+        return $this->response->json($resp);
     }
 }

@@ -2,6 +2,8 @@
 
 namespace Controllers;
 
+use Enums\Errors;
+use Enums\ListRights;
 use Models\Group;
 use Models\User;
 use Models\UserMembership;
@@ -15,13 +17,32 @@ class UserController extends AbstractController
      */
     public function create(): Response
     {
-        $resp = 'error';
+        $resp = ['errors' => [Errors::IncompleteData->value]];
         $result = false;
         $data = $this->request->getInputHandler()->getOriginalPost();
         if (isset($data['user_id']) && isset($data['group_id'])) {
             $user = new User();
             $group = new Group();
-            if ($user->find($data['user_id']) && $group->find($data['group_id'])) {
+            $check1 = false;
+            $check2 = false;
+
+            if ($user->find($data['user_id'])) {
+                $check1 = true;
+            } else {
+                $resp = ['errors' => ['User ' . Errors::NotFound->value]];
+            }
+
+            if ($group->find($data['group_id'])) {
+                $check2 = true;
+            } else {
+                if ($check1) {
+                    $resp = ['errors' => ['Group ' . Errors::NotFound->value]];
+                } else {
+                    $resp['errors'][] = 'Group ' . Errors::NotFound->value;
+                }
+            }
+
+            if ($check1 && $check2) {
                 $userMembership = new UserMembership();
                 $result = $userMembership->save($data['user_id'], $data['group_id']);
             }
@@ -39,7 +60,7 @@ class UserController extends AbstractController
     {
         $userMembership = new UserMembership();
         $userGroups = $userMembership->memberships($user_id);
-        $resp = $userGroups ? $userGroups : ['response' => 'User group membership not found.'];
+        $resp = $userGroups ? $userGroups : ['errors' => 'User group membership' . Errors::NotFound->value];
         return $this->response->json($resp);
     }
 
@@ -50,12 +71,19 @@ class UserController extends AbstractController
      */
     public function showUsersRights(int $user_id): Response
     {
-        $resp = 'error';
+        $resp = ['errors' => ['User ' . Errors::NotFound->value]];
         $result = false;
         $user = new User();
         if ($user->find($user_id)) {
             $result = $user->getRights($user_id);
-            $resp = $result ? $result : ['response' => 'User rights not found.'];
+            if ($result) {
+                $rights = collect(ListRights::cases())->map(fn ($item) => $item->value)->toArray();
+                $resp = collect($result)->unique()->map(function ($item) use ($rights) {
+                    return in_array($item['right_name'], $rights) ? [$item['right_name'] => true] : [$item['right_name'] => false];
+                })->values();
+            } else {
+                $resp = ['errors' => 'User rights ' . Errors::NotFound->value];
+            }
         }
         return $this->response->json($resp);
     }

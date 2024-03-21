@@ -32,7 +32,7 @@ class ServiceController extends AbstractController
 
     /**
      * Stub.
-     * @param array $
+     * @param array $rights
      * @return array
      */
     private function debug(array $rights): array
