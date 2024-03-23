@@ -2,6 +2,7 @@
 
 namespace Controllers;
 
+use Enums\Errors;
 use Pecee\Http\Response;
 use Service\RequestDataCheck;
 
@@ -16,7 +17,7 @@ class EntityController extends AbstractController
      */
     public function create(string $target): Response
     {
-        $resp = 'error';
+        $resp = ['errors' => 'Entity ' . Errors::NotFound->value];
         $result = false;
         $check = new RequestDataCheck();
         if ($check->checkEntityExist($target)) {
@@ -27,6 +28,8 @@ class EntityController extends AbstractController
                     $entity = new $className();
                     $result = $entity->save($data['title']);
                 }
+            } else {
+                $resp = ['errors' => [Errors::IncompleteData->value]];
             }
         }
         $resp = $result ? ucfirst($target) . ' created.' : $resp;
@@ -40,7 +43,7 @@ class EntityController extends AbstractController
      */
     public function index(string $target, int $offset = 0): Response
     {
-        $resp = 'error';
+        $resp = ['errors' => 'Entity ' . Errors::NotFound->value];
         $result = [];
         $check = new RequestDataCheck();
         if ($check->checkEntityExist($target)) {
@@ -48,6 +51,6 @@ class EntityController extends AbstractController
             $entity = new $className();
             $result = $entity->all($this->perPage, $offset);
         }
-        return $this->response->json(['data' => $result ? $result : $resp]);
+        return $this->response->json(['response' => $result ? $result : $resp]);
     }
 }

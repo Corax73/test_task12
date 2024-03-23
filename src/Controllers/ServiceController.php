@@ -2,6 +2,7 @@
 
 namespace Controllers;
 
+use Enums\Errors;
 use Enums\PermissionsForActions;
 use Models\User;
 use Pecee\Http\Response;
@@ -16,7 +17,7 @@ class ServiceController extends AbstractController
      */
     public function service(string $command): Response
     {
-        $resp = [];
+        $resp = ['errors' => [Errors::IncompleteData->value]];
         $data = $this->request->getInputHandler()->getOriginalPost();
         if (isset($data['token']) && isset($data['email'])) {
             $user = new User();
@@ -25,6 +26,8 @@ class ServiceController extends AbstractController
                 if (method_exists($this, $command)) {
                     $resp = $this->$command($user->getRightsByEmail($data['email']));
                 }
+            } else {
+                $resp = ['errors' => [Errors::NoRights->value]];
             }
         }
         return $this->response->json($resp);

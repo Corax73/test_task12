@@ -2,6 +2,7 @@
 
 namespace Controllers;
 
+use Enums\Errors;
 use Enums\ListRights;
 use Models\Group;
 use Models\GroupRights;
@@ -14,17 +15,22 @@ class RightsController extends AbstractController
      */
     public function create(): Response
     {
-        $resp = 'error';
+        $resp = ['errors' => [Errors::IncompleteData->value]];
         $result = false;
         $data = $this->request->getInputHandler()->getOriginalPost();
         if (isset($data['group_id']) && isset($data['right'])) {
             $group = new Group();
             if ($group->find($data['group_id'])) {
-                $declaredRights = collect(ListRights::cases())->map(fn($item) => $item->value)->toArray();
+                $declaredRights = collect(ListRights::cases())->map(fn ($item) => $item->value)->toArray();
                 if ($declaredRights && in_array($data['right'], $declaredRights)) {
                     $groupRights = new GroupRights();
                     $result = $groupRights->save($data['group_id'], $data['right']);
+                } else {
+                    $right = $data['right'];
+                    $resp = ['errors' => "Right $right " . Errors::NotFound->value];
                 }
+            } else {
+                $resp = ['errors' => 'Group ' . Errors::NotFound->value];
             }
         }
         $resp = $result ? 'right settled' : $resp;
@@ -38,9 +44,10 @@ class RightsController extends AbstractController
      */
     public function show(int $group_id): Response
     {
+        $resp = ['errors' => 'Rights ' . Errors::NotFound->value];
         $group = new Group();
         $rights = $group->rights($group_id);
-        $resp = $rights ? $rights : ['response' => 'Rights not found.'];
+        $resp = $rights ? $rights : $resp;
         return $this->response->json($resp);
     }
 }

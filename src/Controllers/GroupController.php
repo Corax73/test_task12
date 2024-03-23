@@ -2,6 +2,7 @@
 
 namespace Controllers;
 
+use Enums\Errors;
 use Models\Group;
 use Models\User;
 use Pecee\Http\Response;
@@ -15,7 +16,7 @@ class GroupController extends AbstractController
      */
     public function show(int $group_id): Response
     {
-        $resp = 'error';
+        $resp = ['errors' => 'Group ' . Errors::NotFound->value];
         $result = false;
         $group = new Group();
         if ($group->find($group_id)) {
@@ -24,8 +25,8 @@ class GroupController extends AbstractController
                 $user = new User();
                 $result = $user->find($usersIds);
             }
-            $resp = $result ? $result : ['response' => 'Group users not found.'];
+            $resp = $result ? $result : 'Group users not found.';
         }
-        return $this->response->json($resp);
+        return $this->response->json(['response' => $resp]);
     }
 }
