@@ -61,7 +61,7 @@ class UserController extends AbstractController
         $userMembership = new UserMembership();
         $userGroups = $userMembership->memberships($user_id);
         $resp = $userGroups ? $userGroups : ['errors' => 'User group membership' . Errors::NotFound->value];
-        return $this->response->json($resp);
+        return $this->response->json(['response' => $resp]);
     }
 
     /**
@@ -85,6 +85,30 @@ class UserController extends AbstractController
                 $resp = ['errors' => 'User rights ' . Errors::NotFound->value];
             }
         }
-        return $this->response->json($resp);
+        return $this->response->json(['response' => $resp]);
+    }
+
+    /**
+     * Removes a user's membership in a group.
+     * @param int $user_id
+     * @param int $group_id
+     * @return Pecee\Http\Response
+     */
+    public function destroyUserMembership(int $user_id, int $group_id): Response
+    {
+        $resp = ['errors' => ['User ' . Errors::NotFound->value]];
+        $result = false;
+        $user = new User();
+        $group = new Group();
+        if ($user->find($user_id)) {
+            if ($group->find($group_id)) {
+                $userMembership = new UserMembership();
+                $result = $userMembership->delete($user_id, $group_id);
+            } else {
+                $resp['errors'] = 'Group ' . Errors::NotFound->value;
+            }
+        }
+        $resp =  $result ? 'User membership removed.' : $resp;
+        return $this->response->json(['response' => $resp]);
     }
 }

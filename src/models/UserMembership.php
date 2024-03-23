@@ -66,7 +66,26 @@ class UserMembership extends AbstractModel
         ];
         $stmt = $this->connect->connect(PATH_CONF)->prepare($query);
         $stmt->execute($params);
-        $usersIds = collect($stmt->fetchAll(PDO::FETCH_ASSOC))->map(fn($item) => $item['user_id'])->toArray();
+        $usersIds = collect($stmt->fetchAll(PDO::FETCH_ASSOC))->map(fn ($item) => $item['user_id'])->toArray();
         return $usersIds;
+    }
+
+    /**
+     * Removes a user's membership in a group.
+     * @param int $user_id
+     * @param int $group_id
+     * @return bool
+     */
+    public function delete(int $user_id, int $group_id): bool
+    {
+        $resp = false;
+        $query = 'DELETE FROM `' . $this->table . '` WHERE `user_id` = :user_id AND `group_id` = :group_id';
+        $params = [
+            ':user_id' => $user_id,
+            ':group_id' => $group_id
+        ];
+        $stmt = $this->connect->connect(PATH_CONF)->prepare($query);
+        $resp = $stmt->execute($params);
+        return $resp;
     }
 }

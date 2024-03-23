@@ -14,4 +14,5 @@ enum Errors: string
     case Unique = 'not unique';
     case BadPassword = 'invalid characters in the password or shorter than 8 characters';
     case NoRights = 'no rights';
+    case Default = 'error, try later';
 }

@@ -6,7 +6,9 @@ use Models\Connect;
 use PDO;
 
 /**
- * @property string $table
+ * @property protected string $table
+ * @property protected array $fillable;
+ * @property protected array $guarded;
  * @property Connect $connect
  */
 abstract class AbstractModel
