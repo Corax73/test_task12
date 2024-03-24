@@ -5,6 +5,7 @@ namespace Controllers;
 use Enums\Errors;
 use Enums\ListRights;
 use Models\Group;
+use Models\TempBlockedUsers;
 use Models\User;
 use Models\UserMembership;
 use Pecee\Http\Response;
@@ -109,6 +110,46 @@ class UserController extends AbstractController
             }
         }
         $resp =  $result ? 'User membership removed.' : $resp;
+        return $this->response->json(['response' => $resp]);
+    }
+
+    /**
+     * Sets the user to temporarily blocked.
+     * @return Pecee\Http\Response
+     */
+    public function setTempBlockedUsers(): Response
+    {
+        $result = false;
+        $resp = ['errors' => [Errors::IncompleteData->value]];
+        $data = $this->request->getInputHandler()->getOriginalPost();
+        if (isset($data['user_id'])) {
+            $user = new User();
+            if($user->find($data['user_id'])) {
+                $tempBlocked = new TempBlockedUsers();
+                $result = $tempBlocked->save($data['user_id']);
+            } else {
+                $resp['errors'] = 'User ' . Errors::NotFound->value;
+            }
+            $resp =  $result ? 'The user was placed in temporarily blocked.' : $resp;
+        }
+        return $this->response->json(['response' => $resp]);
+    }
+
+    /**
+     * Removes a user from temporarily blocked.
+     * @param int $user_id
+     * @return Pecee\Http\Response
+     */
+    public function destroyTemporaryBlockingUser(int $user_id): Response
+    {
+        $resp = ['errors' => ['User ' . Errors::NotFound->value]];
+        $result = false;
+        $user = new User();
+        if ($user->find($user_id)) {
+            $tempBlocked = new TempBlockedUsers();
+            $result = $tempBlocked->delete($user_id);
+        }
+        $resp =  $result ? 'The user has been removed from the temporarily blocked list.' : $resp;
         return $this->response->json(['response' => $resp]);
     }
 }

@@ -15,6 +15,8 @@ SimpleRouter::group(['prefix' => 'api'], function () {
     SimpleRouter::get('/users/membership/{user_id}', [UserController::class, 'showUsersGroups'])->name('getUsersGroups');
     SimpleRouter::post('/users/membership/', [UserController::class, 'create'])->name('setUserGroupMembership');
     SimpleRouter::delete('/users/membership/{user_id}/{group_id}', [UserController::class, 'destroyUserMembership'])->name('destroyUserGroupMembership');
+    SimpleRouter::post('/users/temp-blocked/', [UserController::class, 'setTempBlockedUsers'])->name('setTempBlockedUsers');
+    SimpleRouter::delete('/users/temp-blocked/{user_id}', [UserController::class, 'destroyTemporaryBlockingUser'])->name('destroyTemporaryBlockingUser');
     SimpleRouter::post('/create/{target}', [EntityController::class, 'create'])->name('createEntity');
     SimpleRouter::get('/entities/{target}/{offset?}', [EntityController::class, 'index'])->name('getListEntities');
     SimpleRouter::post('/rights/groups/', [RightsController::class, 'create'])->name('setGroupRights');

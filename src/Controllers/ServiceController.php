@@ -48,4 +48,36 @@ class ServiceController extends AbstractController
         }
         return ['debug' => $resp];
     }
+
+    /**
+     * Stub.
+     * @param array $rights
+     * @return array
+     */
+    private function send_messages(array $rights): array
+    {
+        $resp = false;
+        if ($rights) {
+            if(in_array(PermissionsForActions::DebugSet->value, $rights)) {
+                $resp = true;
+            }
+        }
+        return ['send_messages' => $resp];
+    }
+
+    /**
+     * Stub.
+     * @param array $rights
+     * @return array
+     */
+    private function service_api(array $rights): array
+    {
+        $resp = false;
+        if ($rights) {
+            if(in_array(PermissionsForActions::DebugSet->value, $rights)) {
+                $resp = true;
+            }
+        }
+        return ['service_api' => $resp];
+    }
 }
