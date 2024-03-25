@@ -7,6 +7,7 @@ use Enums\ListRights;
 use Models\Group;
 use Models\GroupRights;
 use Models\TempBlockedRights;
+use Pecee\Http\Response;
 
 class RightsController extends AbstractController
 {
@@ -49,6 +50,29 @@ class RightsController extends AbstractController
         $group = new Group();
         $rights = $group->rights($group_id);
         $resp = $rights ? $rights : $resp;
+        return $this->response->json(['response' => $resp]);
+    }
+
+    /**
+     * Removes a right in a group.
+     * @param int $group_id
+     * @param string $rightName
+     * @return Pecee\Http\Response
+     */
+    public function destroy(int $groupId, string $rightName): Response
+    {
+        $result = false;
+        $resp = ['errors' => 'Group ' . Errors::NotFound->value];
+        $group = new Group();
+        if ($group->find($groupId)) {
+            $declaredRights = collect(ListRights::cases())->map(fn ($item) => $item->value)->toArray();
+            $resp = ['errors' => "Right $rightName " . Errors::NotFound->value];
+            if ($declaredRights && in_array($rightName, $declaredRights)) {
+                $groupRights = new GroupRights();
+                $result = $groupRights->delete($groupId, $rightName);
+            }
+        }
+        $resp = $result ? 'group right removed' : $resp;
         return $this->response->json(['response' => $resp]);
     }
 

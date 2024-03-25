@@ -53,4 +53,23 @@ class GroupRights extends AbstractModel
         $rights = $stmt->fetchAll(PDO::FETCH_ASSOC);
         return $rights;
     }
+
+    /**
+     * Removes a right in a group.
+     * @param int $groupId
+     * @param string $rightName
+     * @return bool
+     */
+    public function delete(int $group_id, string $right): bool
+    {
+        $resp = false;
+        $query = 'DELETE FROM `' . $this->table . '` WHERE `group_id` = :group_id AND `right_name` = :right';
+        $params = [
+            ':group_id' => $group_id,
+            ':right' => $right
+        ];
+        $stmt = $this->connect->connect(PATH_CONF)->prepare($query);
+        $resp = $stmt->execute($params);
+        return $resp;
+    }
 }

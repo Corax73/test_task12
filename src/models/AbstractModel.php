@@ -55,6 +55,12 @@ abstract class AbstractModel
         return $resp ? $resp : false;
     }
 
+    /**
+     * Returns an array of all model entries.
+     * @param int $limit
+     * @param int $offset
+     * @return array
+     */
     public function all(int $limit = 12, int $offset = 0): array
     {
         $query = 'SELECT * FROM `' . $this->table . '` LIMIT :limit';
