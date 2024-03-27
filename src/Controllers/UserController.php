@@ -78,9 +78,10 @@ class UserController extends AbstractController
         if ($user->find($user_id)) {
             $result = $user->getRights($user_id);
             if ($result) {
-                $rights = collect(ListRights::cases())->map(fn ($item) => $item->value)->toArray();
-                $resp = collect($result)->unique()->map(function ($item) use ($rights) {
-                    return in_array($item['right_name'], $rights) ? [$item['right_name'] => true] : [$item['right_name'] => false];
+                $result = collect($result)->unique()->collapse()->values()->toArray();
+                $rights = collect(ListRights::cases())->map(fn ($item) => $item->value);
+                $resp = $rights->map(function ($item) use ($result) {
+                    return in_array($item, $result) ? [$item => true] : [$item => false];
                 })->values();
             } else {
                 $resp = ['errors' => 'User rights ' . Errors::NotFound->value];
@@ -124,7 +125,7 @@ class UserController extends AbstractController
         $data = $this->request->getInputHandler()->getOriginalPost();
         if (isset($data['user_id'])) {
             $user = new User();
-            if($user->find($data['user_id'])) {
+            if ($user->find($data['user_id'])) {
                 $tempBlocked = new TempBlockedUsers();
                 $result = $tempBlocked->save($data['user_id']);
             } else {
