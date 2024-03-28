@@ -2,6 +2,8 @@
 
 namespace Service;
 
+use Models\GroupRights;
+use Models\UserMembership;
 use PDO;
 
 class RequestDataCheck extends AbstractService
@@ -82,5 +84,53 @@ class RequestDataCheck extends AbstractService
             $resp = true;
         }
         return $resp;
+    }
+
+    /**
+     * Checks whether a group has the right.
+     * @param int $group_id
+     * @param string $right_name
+     * @return bool
+     */
+    public function checkGroupHasRight(int $group_id, string $right_name): bool
+    {
+        $groupRights = new GroupRights();
+        $query = "SELECT * FROM `" . $groupRights->getTable() . "` WHERE group_id = :group_id AND right_name = :right_name";
+        $params = [
+            ':group_id' => $group_id,
+            ':right_name' => $right_name
+        ];
+        $stmt = $this->connect->connect(PATH_CONF)->prepare($query);
+        $stmt->execute($params);
+        $row = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        if (count($row) > 0) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    /**
+     * Checking whether a user is in a group.
+     * @param int $group_id
+     * @param int $user_id
+     * @return bool
+     */
+    public function checkGroupHasUser(int $group_id, int $user_id): bool
+    {
+        $userMembership = new UserMembership();
+        $query = "SELECT * FROM `" . $userMembership->getTable() . "` WHERE group_id = :group_id AND user_id = :user_id";
+        $params = [
+            ':group_id' => $group_id,
+            ':user_id' => $user_id
+        ];
+        $stmt = $this->connect->connect(PATH_CONF)->prepare($query);
+        $stmt->execute($params);
+        $row = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        if (count($row) > 0) {
+            return true;
+        } else {
+            return false;
+        }
     }
 }

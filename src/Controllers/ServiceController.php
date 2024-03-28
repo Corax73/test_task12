@@ -19,7 +19,7 @@ class ServiceController extends AbstractController
     {
         $resp = ['errors' => [Errors::IncompleteData->value]];
         $data = $this->request->getInputHandler()->getOriginalPost();
-        if (isset($data['token']) && isset($data['email'])) {
+        if (isset($data['token']) && isset($data['email']) && $data['token'] != NULL && $data['email'] != NULL) {
             $user = new User();
             $usersToken = $user->getToken($data['email']);
             if ($usersToken != 'error' && $usersToken === $data['token']) {

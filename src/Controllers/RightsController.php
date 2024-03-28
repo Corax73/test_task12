@@ -8,6 +8,7 @@ use Models\Group;
 use Models\GroupRights;
 use Models\TempBlockedRights;
 use Pecee\Http\Response;
+use Service\RequestDataCheck;
 
 class RightsController extends AbstractController
 {
@@ -20,13 +21,19 @@ class RightsController extends AbstractController
         $resp = ['errors' => [Errors::IncompleteData->value]];
         $result = false;
         $data = $this->request->getInputHandler()->getOriginalPost();
-        if (isset($data['group_id']) && isset($data['right'])) {
+        if (isset($data['group_id']) && isset($data['right']) && $data['right'] != NULL && $data['group_id'] != NULL) {
             $group = new Group();
             if ($group->find($data['group_id'])) {
                 $declaredRights = collect(ListRights::cases())->map(fn ($item) => $item->value)->toArray();
                 if ($declaredRights && in_array($data['right'], $declaredRights)) {
-                    $groupRights = new GroupRights();
-                    $result = $groupRights->save($data['group_id'], $data['right']);
+                    $requestDataCheck = new RequestDataCheck();
+                    if (!$requestDataCheck->checkGroupHasRight($data['group_id'], $data['right'])) {
+                        $groupRights = new GroupRights();
+                        $result = $groupRights->save($data['group_id'], $data['right']);
+                    } else {
+                        $right = $data['right'];
+                        $resp = ['errors' => "Right $right " . Errors::AlreadyAvailable->value];
+                    }
                 } else {
                     $right = $data['right'];
                     $resp = ['errors' => "Right $right " . Errors::NotFound->value];
@@ -84,7 +91,7 @@ class RightsController extends AbstractController
     {
         $resp = ['errors' => [Errors::IncompleteData->value]];
         $data = $this->request->getInputHandler()->getOriginalPost();
-        if (isset($data['right'])) {
+        if (isset($data['right']) && $data['right'] != NULL) {
             $tempBlocked = new TempBlockedRights();
             $declaredRights = collect(ListRights::cases())->map(fn ($item) => $item->value)->toArray();
             $right = $data['right'];

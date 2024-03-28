@@ -9,6 +9,7 @@ use Models\TempBlockedUsers;
 use Models\User;
 use Models\UserMembership;
 use Pecee\Http\Response;
+use Service\RequestDataCheck;
 
 class UserController extends AbstractController
 {
@@ -21,7 +22,7 @@ class UserController extends AbstractController
         $resp = ['errors' => [Errors::IncompleteData->value]];
         $result = false;
         $data = $this->request->getInputHandler()->getOriginalPost();
-        if (isset($data['user_id']) && isset($data['group_id'])) {
+        if (isset($data['user_id']) && isset($data['group_id']) && $data['user_id'] != NULL && $data['group_id'] != NULL) {
             $user = new User();
             $group = new Group();
             $check1 = false;
@@ -44,8 +45,14 @@ class UserController extends AbstractController
             }
 
             if ($check1 && $check2) {
-                $userMembership = new UserMembership();
-                $result = $userMembership->save($data['user_id'], $data['group_id']);
+                $requestDataCheck = new RequestDataCheck();
+                if (!$requestDataCheck->checkGroupHasUser($data['group_id'], $data['user_id'])) {
+                    $userMembership = new UserMembership();
+                    $result = $userMembership->save($data['user_id'], $data['group_id']);
+                } else {
+                    $userId = $data['user_id'];
+                    $resp = ['errors' => "User with ID $userId " . Errors::AlreadyAvailable->value];
+                }
             }
         }
         $resp = $result ? 'user\'s group membership settled' : $resp;
@@ -123,7 +130,7 @@ class UserController extends AbstractController
         $result = false;
         $resp = ['errors' => [Errors::IncompleteData->value]];
         $data = $this->request->getInputHandler()->getOriginalPost();
-        if (isset($data['user_id'])) {
+        if (isset($data['user_id']) && $data['user_id'] != NULL) {
             $user = new User();
             if ($user->find($data['user_id'])) {
                 $tempBlocked = new TempBlockedUsers();

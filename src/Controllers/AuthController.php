@@ -19,7 +19,7 @@ class AuthController extends AbstractController
         $resp = ['errors' => [Errors::IncompleteData->value]];
         $user = new User();
         $data = $this->request->getInputHandler()->getOriginalPost();
-        if (isset($data['email']) && isset($data['password'])) {
+        if (isset($data['email']) && isset($data['password']) && $data['email'] != NULL && $data['password'] != NULL) {
             $auth = $user->authUser($data['email'], $data['password']);
             if ($auth) {
                 $token = $user->getToken($data['email']);
@@ -39,7 +39,10 @@ class AuthController extends AbstractController
     {
         $resp = ['errors' => [Errors::IncompleteData->value]];
         $data = $this->request->getInputHandler()->getOriginalPost();
-        if (isset($data['email']) && isset($data['password']) && isset($data['password_confirm'])) {
+        if (
+            isset($data['email']) && isset($data['password']) && isset($data['password_confirm'])
+            && $data['email'] != NULL && $data['password'] != NULL && $data['password_confirm'] != NULL
+        ) {
             if ($data['password'] == $data['password_confirm']) {
                 $check = new RequestDataCheck();
                 if ($check->checkEmailUniqueness($data['email'])) {
