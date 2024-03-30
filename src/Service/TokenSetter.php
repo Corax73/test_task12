@@ -22,7 +22,7 @@ class TokenSetter extends AbstractService
             ':remember_token' => $token
         ];
         $stmt = $this->connect->connect(PATH_CONF)->prepare($query);
-        $resp =  $stmt->execute($params);
+        $resp = $stmt->execute($params);
         return $resp;
     }
 }

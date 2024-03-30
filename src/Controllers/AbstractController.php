@@ -17,7 +17,7 @@ abstract class AbstractController
     public function __construct()
     {
         $this->request = SimpleRouter::router()->getRequest();
-        $this->response =  new Response($this->request);
+        $this->response = new Response($this->request);
     }
 
     public function setCors()

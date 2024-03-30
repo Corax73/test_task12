@@ -126,7 +126,7 @@ class RightsController extends AbstractController
             $result = false;
             $tempBlocked = new TempBlockedRights();
             $result = $tempBlocked->delete($rightName);
-            $resp =  $result ? "Temporary blocking of the right $rightName has been removed." : Errors::Default->value;
+            $resp = $result ? "Temporary blocking of the right $rightName has been removed." : Errors::Default->value;
         }
         return $this->response->json(['response' => $resp]);
     }

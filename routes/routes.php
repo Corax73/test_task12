@@ -22,6 +22,7 @@ SimpleRouter::group(['prefix' => 'api'], function () {
         SimpleRouter::delete('/membership/{user_id}/{group_id}', [UserController::class, 'destroyUserMembership'])->name('destroyUserGroupMembership');
         SimpleRouter::post('/temp-blocked/', [UserController::class, 'setTempBlockedUsers'])->name('setTempBlockedUsers');
         SimpleRouter::delete('/temp-blocked/{user_id}', [UserController::class, 'destroyTemporaryBlockingUser'])->name('destroyTemporaryBlockingUser');
+        SimpleRouter::delete('{user_id}', [UserController::class, 'destroy'])->name('destroyUser');
     });
     SimpleRouter::partialGroup('rights', function () {
         SimpleRouter::post('/groups/', [RightsController::class, 'create'])->name('setGroupRights');

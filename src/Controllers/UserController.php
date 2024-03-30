@@ -117,7 +117,7 @@ class UserController extends AbstractController
                 $resp['errors'] = 'Group ' . Errors::NotFound->value;
             }
         }
-        $resp =  $result ? 'User membership removed.' : $resp;
+        $resp = $result ? 'User membership removed.' : $resp;
         return $this->response->json(['response' => $resp]);
     }
 
@@ -144,7 +144,7 @@ class UserController extends AbstractController
             } else {
                 $resp['errors'] = 'User ' . Errors::NotFound->value;
             }
-            $resp =  $result ? 'The user was placed in temporarily blocked.' : $resp;
+            $resp = $result ? 'The user was placed in temporarily blocked.' : $resp;
         }
         return $this->response->json(['response' => $resp]);
     }
@@ -163,7 +163,24 @@ class UserController extends AbstractController
             $tempBlocked = new TempBlockedUsers();
             $result = $tempBlocked->delete($user_id);
         }
-        $resp =  $result ? 'The user has been removed from the temporarily blocked list.' : $resp;
+        $resp = $result ? 'The user has been removed from the temporarily blocked list.' : $resp;
+        return $this->response->json(['response' => $resp]);
+    }
+
+    /**
+     * Deletes a user.
+     * @param int $user_id
+     * @return Pecee\Http\Response
+     */
+    public function destroy(int $user_id): Response
+    {
+        $resp = ['errors' => ['User ' . Errors::NotFound->value]];
+        $result = false;
+        $user = new User();
+        if ($user->find($user_id)) {
+            $result = $user->delete($user_id);
+        }
+        $resp = $result ? 'User deleted.' : $resp;
         return $this->response->json(['response' => $resp]);
     }
 }

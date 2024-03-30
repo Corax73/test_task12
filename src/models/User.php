@@ -133,4 +133,38 @@ class User extends AbstractModel
         $resp = $stmt->fetchAll(PDO::FETCH_ASSOC);
         return $resp ? collect($resp)->flatten()->toArray() : [];
     }
+
+    /**
+     * Deletes a user.
+     * @param int $user_id
+     * @return bool
+     */
+    public function delete(int $user_id): bool
+    {
+        $resp = false;
+        $query = 'DELETE FROM `' . $this->table . '` WHERE `id` = :user_id';
+        $params = [
+            ':user_id' => $user_id,
+        ];
+        $stmt = $this->connect->connect(PATH_CONF)->prepare($query);
+        $resp = $stmt->execute($params);
+        return $resp;
+    }
+
+    /**
+     * Returns an array of user fields by his email.
+     * @param string $email
+     * @return array
+     */
+    public function getByEmail(string $email): array
+    {
+        $query = 'SELECT id, ' . implode(', ', array_diff($this->fillable, $this->guarded)) . ',created_at FROM `' . $this->table . '` WHERE `email` = :email';
+        $params = [
+            ':email' => $email
+        ];
+        $stmt = $this->connect->connect(PATH_CONF)->prepare($query);
+        $stmt->execute($params);
+        $resp = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        return $resp ? collect($resp)->flatten()->toArray() : [];
+    }
 }
