@@ -96,9 +96,15 @@ class RightsController extends AbstractController
             $declaredRights = collect(ListRights::cases())->map(fn ($item) => $item->value)->toArray();
             $right = $data['right'];
             if ($declaredRights && in_array($right, $declaredRights)) {
-                $result = $tempBlocked->save($right);
-                if ($result) {
-                    $resp = "Temporary blocking of the right $right has been established";
+                $requestDataCheck = new RequestDataCheck();
+                if (!$requestDataCheck->checkRightBlock($data['right'])) {
+                    $result = $tempBlocked->save($right);
+                    if ($result) {
+                        $resp = "Temporary blocking of the right $right has been established";
+                    }
+                } else {
+                    $right = $data['right'];
+                    $resp = ['errors' => "Right $right " . Errors::AlreadyBlocked->value];
                 }
             } else {
                 $resp = ['errors' => "Right $right " . Errors::NotFound->value];

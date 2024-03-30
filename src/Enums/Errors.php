@@ -16,4 +16,5 @@ enum Errors: string
     case NoRights = 'no rights';
     case Default = 'error, try later';
     case AlreadyAvailable = 'already available';
+    case AlreadyBlocked = 'already blocked';
 }

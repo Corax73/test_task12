@@ -22,6 +22,7 @@
     },
     "require": {
         "pecee/simple-router": "5.4.1.7",
-        "illuminate/collections": "^11.0"
+        "illuminate/collections": "^11.0",
+        "guzzlehttp/guzzle": "^7.7"
     }
 }

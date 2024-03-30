@@ -3,6 +3,8 @@
 namespace Service;
 
 use Models\GroupRights;
+use Models\TempBlockedRights;
+use Models\TempBlockedUsers;
 use Models\UserMembership;
 use PDO;
 
@@ -95,7 +97,7 @@ class RequestDataCheck extends AbstractService
     public function checkGroupHasRight(int $group_id, string $right_name): bool
     {
         $groupRights = new GroupRights();
-        $query = "SELECT * FROM `" . $groupRights->getTable() . "` WHERE group_id = :group_id AND right_name = :right_name";
+        $query = "SELECT id FROM `" . $groupRights->getTable() . "` WHERE group_id = :group_id AND right_name = :right_name";
         $params = [
             ':group_id' => $group_id,
             ':right_name' => $right_name
@@ -119,10 +121,54 @@ class RequestDataCheck extends AbstractService
     public function checkGroupHasUser(int $group_id, int $user_id): bool
     {
         $userMembership = new UserMembership();
-        $query = "SELECT * FROM `" . $userMembership->getTable() . "` WHERE group_id = :group_id AND user_id = :user_id";
+        $query = "SELECT id FROM `" . $userMembership->getTable() . "` WHERE group_id = :group_id AND user_id = :user_id";
         $params = [
             ':group_id' => $group_id,
             ':user_id' => $user_id
+        ];
+        $stmt = $this->connect->connect(PATH_CONF)->prepare($query);
+        $stmt->execute($params);
+        $row = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        if (count($row) > 0) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    /**
+     * Checks user blocking.
+     * @param int $user_id
+     * @return bool
+     */
+    public function checkUserBlock(int $user_id): bool
+    {
+        $tempBlockedUsers = new TempBlockedUsers();
+        $query = "SELECT id FROM `" . $tempBlockedUsers->getTable() . "` WHERE user_id = :user_id";
+        $params = [
+            ':user_id' => $user_id
+        ];
+        $stmt = $this->connect->connect(PATH_CONF)->prepare($query);
+        $stmt->execute($params);
+        $row = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        if (count($row) > 0) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    /**
+     * Checks right blocking.
+     * @param string $right_name
+     * @return bool
+     */
+    public function checkRightBlock(string $right_name): bool
+    {
+        $tempBlockedRights = new TempBlockedRights();
+        $query = "SELECT id FROM `" . $tempBlockedRights->getTable() . "` WHERE right_name = :right_name";
+        $params = [
+            ':right_name' => $right_name
         ];
         $stmt = $this->connect->connect(PATH_CONF)->prepare($query);
         $stmt->execute($params);

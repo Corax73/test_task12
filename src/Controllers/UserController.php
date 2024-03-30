@@ -133,8 +133,14 @@ class UserController extends AbstractController
         if (isset($data['user_id']) && $data['user_id'] != NULL) {
             $user = new User();
             if ($user->find($data['user_id'])) {
-                $tempBlocked = new TempBlockedUsers();
-                $result = $tempBlocked->save($data['user_id']);
+                $requestDataCheck = new RequestDataCheck();
+                if (!$requestDataCheck->checkUserBlock($data['user_id'])) {
+                    $tempBlocked = new TempBlockedUsers();
+                    $result = $tempBlocked->save($data['user_id']);
+                } else {
+                    $userId = $data['user_id'];
+                    $resp = ['errors' => "User with ID $userId " . Errors::AlreadyBlocked->value];
+                }
             } else {
                 $resp['errors'] = 'User ' . Errors::NotFound->value;
             }
