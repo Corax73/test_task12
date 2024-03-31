@@ -11,9 +11,11 @@ use Pecee\SimpleRouter\SimpleRouter;
 SimpleRouter::group(['prefix' => 'api'], function () {
     SimpleRouter::post('/login', [AuthController::class, 'login'])->name('main');
     SimpleRouter::post('/registration', [AuthController::class, 'registration'])->name('registration');
-    SimpleRouter::post('/create/{target}', [EntityController::class, 'create'])->name('createEntity');
+    SimpleRouter::partialGroup('groups', function () {
+        SimpleRouter::post('', [GroupController::class, 'create'])->name('createGroup');
+        SimpleRouter::get('/users/{group_id}', [GroupController::class, 'show'])->name('getGroupUsers');
+    });
     SimpleRouter::get('/entities/{target}/{offset?}', [EntityController::class, 'index'])->name('getListEntities');
-    SimpleRouter::get('/groups/users/{group_id}', [GroupController::class, 'show'])->name('getGroupUsers');
     SimpleRouter::post('/service/{command}', [ServiceController::class, 'service'])->name('service');
     SimpleRouter::partialGroup('users', function () {
         SimpleRouter::get('/rights/{user_id}', [UserController::class, 'showUsersRights'])->name('getUserRights');

@@ -2,7 +2,6 @@
 
 namespace Controllers;
 
-//require_once '..config\const.php';
 require_once 'config/const.php';
 
 use PHPUnit\Framework\TestCase;
@@ -53,6 +52,8 @@ class AuthControllerTest extends TestCase
         $this->http = NULL;
         $this->invalidCredentials = NULL;
         $this->invalidCredentials = NULL;
+        $this->invalidRegData = NULL;
+        $this->invalidRegData = NULL;
     }
 
     public function testLoginWithInvalidCredentials(): void
