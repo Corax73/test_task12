@@ -2,8 +2,6 @@
 
 namespace Controllers;
 
-require_once 'config/const.php';
-
 use PHPUnit\Framework\TestCase;
 use GuzzleHttp\Client;
 
@@ -45,7 +43,22 @@ class EntityControllerTest extends TestCase
             'GET',
             '/api/entities/' . $this->validTarget
         );
-        $arrUsers = json_decode($response->getBody()->getContents(), true)['response'];
-        $this->assertCount(12, $arrUsers);
+        $users1 = json_decode($response->getBody()->getContents(), true)['response'];
+        $this->assertCount(12, $users1);
+    }
+
+    public function testIndexWithValidTargetAndOffset(): void
+    {
+        $response1 = $this->http->request(
+            'GET',
+            '/api/entities/' . $this->validTarget
+        );
+        $response2 = $this->http->request(
+            'GET',
+            '/api/entities/' . $this->validTarget . '/' . $this->offset
+        );
+        $users1 = json_decode($response1->getBody()->getContents(), true)['response'];
+        $users2 = json_decode($response2->getBody()->getContents(), true)['response'];
+        $this->assertTrue(count(array_diff($users1[0], $users2[0])) > 0);
     }
 }

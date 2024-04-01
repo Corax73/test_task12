@@ -2,6 +2,8 @@
 
 namespace Models;
 
+use PDO;
+
 class Group extends AbstractModel
 {
     protected string $table = 'groups';
@@ -55,5 +57,39 @@ class Group extends AbstractModel
         $users = $userMembership->users($group_id);
         $resp = $users ? $users : [];
         return $resp;
+    }
+
+    /**
+     * Deletes a group.
+     * @param int $group_id
+     * @return bool
+     */
+    public function delete(int $group_id): bool
+    {
+        $resp = false;
+        $query = 'DELETE FROM `' . $this->table . '` WHERE `id` = :group_id';
+        $params = [
+            ':group_id' => $group_id,
+        ];
+        $stmt = $this->connect->connect(PATH_CONF)->prepare($query);
+        $resp = $stmt->execute($params);
+        return $resp;
+    }
+
+    /**
+     * Returns an array of group fields by its title.
+     * @param string $title
+     * @return array
+     */
+    public function getByTitle(string $title): array
+    {
+        $query = 'SELECT id, ' . implode(', ', array_diff($this->fillable, $this->guarded)) . ',created_at FROM `' . $this->table . '` WHERE `title` = :title';
+        $params = [
+            ':title' => $title
+        ];
+        $stmt = $this->connect->connect(PATH_CONF)->prepare($query);
+        $stmt->execute($params);
+        $resp = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        return $resp ? collect($resp)->flatten()->toArray() : [];
     }
 }
