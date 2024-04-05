@@ -25,12 +25,14 @@ class ServiceController extends AbstractController
             if ($usersToken != 'error' && $usersToken === $data['token']) {
                 if (method_exists($this, $command)) {
                     $resp = $this->$command($user->getRightsByEmail($data['email']));
+                } else {
+                    $resp = ['errors' => "Command $command " . Errors::NotFound->value];
                 }
             } else {
                 $resp = ['errors' => [Errors::NoRights->value]];
             }
         }
-        return $this->response->json($resp);
+        return $this->response->json(['response' => $resp]);
     }
 
     /**
