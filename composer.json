@@ -3,8 +3,9 @@
         "psr-4": {
             "Models\\": "src/Models/",
             "Controllers\\": "src/Controllers/",
-            "Service\\": "src/Service",
-            "Enums\\": "src/Enums"
+            "Service\\": "src/Service/",
+            "Enums\\": "src/Enums/",
+            "ControllersTests\\": "tests/ControllersTests/"
         }
     },
     "authors": [

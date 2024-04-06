@@ -1,6 +1,6 @@
 <?php
 
-namespace Controllers;
+namespace Tests\ControllersTests;
 
 require_once 'config/const.php';
 
