@@ -68,7 +68,7 @@ class UserController extends AbstractController
     {
         $userMembership = new UserMembership();
         $userGroups = $userMembership->memberships($user_id);
-        $resp = $userGroups ? $userGroups : ['errors' => 'User group membership' . Errors::NotFound->value];
+        $resp = $userGroups ? $userGroups : ['errors' => 'User group membership ' . Errors::NotFound->value];
         return $this->response->json(['response' => $resp]);
     }
 
