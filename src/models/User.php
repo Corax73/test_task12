@@ -3,6 +3,7 @@
 namespace Models;
 
 use PDO;
+use Service\RequestDataCheck;
 
 /**
  * @property string $table
@@ -101,10 +102,12 @@ class User extends AbstractModel
         $groupRights = new GroupRights();
         $userMembership = new UserMembership();
         $tempBlockedRights = new TempBlockedRights();
-        $tempBlockedUsers = new TempBlockedUsers();
         $query = 'SELECT `right_name` FROM ' . $groupRights->getTable() . ' WHERE `group_id` IN (SELECT `group_id` FROM ' . $userMembership->getTable()
-            . ' WHERE `user_id` = :id) AND `right_name` NOT IN (SELECT IF ((SELECT Count(`id`) FROM ' . $tempBlockedUsers->getTable()
-            . ' WHERE `user_id` = :id) > 0, (SELECT `right_name` FROM ' . $tempBlockedRights->getTable() . "), ('')))";
+            . ' WHERE `user_id` = :id)';
+        $requestDataCheck = new RequestDataCheck();
+        if ($requestDataCheck->checkUserBlock($id)) {
+            $query .= ' AND `right_name` NOT IN (SELECT `right_name` FROM ' . $tempBlockedRights->getTable() . ')';
+        }
         $params = [
             ':id' => $id
         ];

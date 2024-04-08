@@ -9,7 +9,6 @@ use GuzzleHttp\Client;
 use Models\Group;
 use Models\User;
 use Models\UserMembership;
-use ReflectionClass;
 
 class UserControllerTest extends TestCase
 {
@@ -137,5 +136,35 @@ class UserControllerTest extends TestCase
         );
         $data = json_decode($response->getBody()->getContents(), true);
         $this->assertTrue(count($data) > 0);
+    }
+
+    public function testShowUsersRightsWithInvalidUserId(): void
+    {
+        $response = $this->http->request(
+            'GET',
+            '/api/users/rights/' . $this->invalidUserId
+        );
+        $this->assertJsonStringEqualsJsonString($response->getBody()->getContents(), json_encode(
+            [
+                'response' => ['errors' => ['User not found']]
+            ]
+        ));
+    }
+
+    public function testShowUsersRightsWithValidUserId(): void
+    {
+        $response = $this->http->request(
+            'GET',
+            '/api/users/rights/' . $this->validUserId
+        );
+        $user = new User();
+        $rights = collect($user->getRights($this->validUserId))->collapse()->values()->toArray();
+        $result = [];
+        foreach(json_decode($response->getBody()->getContents(), true) as $key => $val) {
+            if($val && in_array($key, $rights)) {
+                $result[] = $key;
+            }
+        }
+        $this->assertTrue(!array_diff($result, $rights));
     }
 }
