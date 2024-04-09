@@ -114,7 +114,7 @@ class UserController extends AbstractController
                 $userMembership = new UserMembership();
                 $result = $userMembership->delete($user_id, $group_id);
             } else {
-                $resp['errors'] = 'Group ' . Errors::NotFound->value;
+                $resp['errors'] = ['Group ' . Errors::NotFound->value];
             }
         }
         $resp = $result ? 'User membership removed.' : $resp;
@@ -139,10 +139,10 @@ class UserController extends AbstractController
                     $result = $tempBlocked->save($data['user_id']);
                 } else {
                     $userId = $data['user_id'];
-                    $resp = ['errors' => "User with ID $userId " . Errors::AlreadyBlocked->value];
+                    $resp = ['errors' => ["User with ID $userId " . Errors::AlreadyBlocked->value]];
                 }
             } else {
-                $resp['errors'] = 'User ' . Errors::NotFound->value;
+                $resp['errors'] = ['User ' . Errors::NotFound->value];
             }
             $resp = $result ? 'The user was placed in temporarily blocked.' : $resp;
         }

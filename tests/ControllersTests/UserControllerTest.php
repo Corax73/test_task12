@@ -7,6 +7,7 @@ require_once 'config/const.php';
 use PHPUnit\Framework\TestCase;
 use GuzzleHttp\Client;
 use Models\Group;
+use Models\TempBlockedUsers;
 use Models\User;
 use Models\UserMembership;
 
@@ -160,11 +161,97 @@ class UserControllerTest extends TestCase
         $user = new User();
         $rights = collect($user->getRights($this->validUserId))->collapse()->values()->toArray();
         $result = [];
-        foreach(json_decode($response->getBody()->getContents(), true) as $key => $val) {
-            if($val && in_array($key, $rights)) {
+        foreach (json_decode($response->getBody()->getContents(), true) as $key => $val) {
+            if ($val && in_array($key, $rights)) {
                 $result[] = $key;
             }
         }
         $this->assertTrue(!array_diff($result, $rights));
+    }
+
+    public function testDestroyUserMembershipWithInvalidUserId(): void
+    {
+        $response = $this->http->request(
+            'DELETE',
+            '/api/users/membership/' . $this->invalidUserId . '/' . $this->validGroupId
+        );
+        $this->assertJsonStringEqualsJsonString($response->getBody()->getContents(), json_encode(
+            [
+                'response' => ['errors' => ['User not found']]
+            ]
+        ));
+    }
+
+    public function testDestroyUserMembershipWithInvalidGroupId(): void
+    {
+        $response = $this->http->request(
+            'DELETE',
+            '/api/users/membership/' . $this->validUserId . '/' . $this->invalidGroupId
+        );
+        $this->assertJsonStringEqualsJsonString($response->getBody()->getContents(), json_encode(
+            [
+                'response' => ['errors' => ['Group not found']]
+            ]
+        ));
+    }
+
+    public function testDestroyUserMembershipWithValidData(): void
+    {
+        $response = $this->http->request(
+            'DELETE',
+            '/api/users/membership/' . $this->validUserId . '/' . $this->validGroupId
+        );
+        $userMembership = new UserMembership();
+        $userMembership->save($this->validUserId, $this->validGroupId);
+        $this->assertJsonStringEqualsJsonString($response->getBody()->getContents(), json_encode(
+            [
+                'response' => 'User membership removed.'
+            ]
+        ));
+    }
+
+    public function testSetTempBlockedUsersWithInvalidUserId(): void
+    {
+        $response = $this->http->request(
+            'POST',
+            '/api/users/temp-blocked/',
+            [
+                'form_params' => [
+                    'user_id' => $this->invalidUserId
+                ]
+            ]
+        );
+        $this->assertJsonStringEqualsJsonString($response->getBody()->getContents(), json_encode(
+            [
+                'response' => ['errors' => ['User not found']]
+            ]
+        ));
+    }
+
+    public function testSetTempBlockedUsersWithAlreadyBlockedUserId(): void
+    {
+        $tempBlocked = new TempBlockedUsers();
+        $id = $tempBlocked->all(1);
+        if($id) {
+            $id = $id[0]['user_id'];
+        } else {
+            $tempBlocked->save($this->validUserId);
+            $id = $this->validUserId;
+        }
+        $response = $this->http->request(
+            'POST',
+            '/api/users/temp-blocked/',
+            [
+                'form_params' => [
+                    'user_id' => $id
+                ]
+            ]
+        );
+        $tempBlocked->delete($id);
+        $this->assertJsonStringEqualsJsonString($response->getBody()->getContents(), json_encode(
+            [
+                'response' => ['errors' => ["User with ID $id already blocked"]]
+            ]
+        ));
     }
 }
