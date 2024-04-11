@@ -4,6 +4,7 @@ namespace Tests\ControllersTests;
 
 require_once 'config/const.php';
 
+use Controllers\GroupController;
 use PHPUnit\Framework\TestCase;
 use GuzzleHttp\Client;
 use Models\Group;
@@ -26,6 +27,14 @@ class GroupControllerTest extends TestCase
         $this->http = NULL;
         $this->existingGroup = NULL;
         $this->nonExistentGroup = NULL;
+    }
+
+    public function testCreateGroupController(): void
+    {
+        $this->assertContainsOnlyInstancesOf(
+            GroupController::class,
+            [new GroupController]
+        );
     }
 
     public function testCreateWithExistingGroup(): void

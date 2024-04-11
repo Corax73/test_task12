@@ -4,6 +4,7 @@ namespace Tests\ControllersTests;
 
 require_once 'config/const.php';
 
+use Controllers\RightsController;
 use Enums\ListRights;
 use PHPUnit\Framework\TestCase;
 use GuzzleHttp\Client;
@@ -41,6 +42,14 @@ class RightsControllerTest extends TestCase
         $this->group = NULL;
         $this->groupRights = NULL;
         $this->tempBlocked = NULL;
+    }
+
+    public function testCreateRightsController(): void
+    {
+        $this->assertContainsOnlyInstancesOf(
+            RightsController::class,
+            [new RightsController]
+        );
     }
 
     public function testCreateWithExistingRight(): void

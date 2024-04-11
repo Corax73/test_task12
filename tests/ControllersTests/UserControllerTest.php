@@ -4,6 +4,7 @@ namespace Tests\ControllersTests;
 
 require_once 'config/const.php';
 
+use Controllers\UserController;
 use PHPUnit\Framework\TestCase;
 use GuzzleHttp\Client;
 use Models\Group;
@@ -37,6 +38,14 @@ class UserControllerTest extends TestCase
         $this->validUserId = NULL;
         $this->invalidGroupId = NULL;
         $this->validGroupId = NULL;
+    }
+
+    public function testCreateUserController(): void
+    {
+        $this->assertContainsOnlyInstancesOf(
+            UserController::class,
+            [new UserController]
+        );
     }
 
     public function testCreateWithInvalidUserId(): void
@@ -232,7 +241,7 @@ class UserControllerTest extends TestCase
     {
         $tempBlocked = new TempBlockedUsers();
         $id = $tempBlocked->all(1);
-        if($id) {
+        if ($id) {
             $id = $id[0]['user_id'];
         } else {
             $tempBlocked->save($this->validUserId);
@@ -251,6 +260,83 @@ class UserControllerTest extends TestCase
         $this->assertJsonStringEqualsJsonString($response->getBody()->getContents(), json_encode(
             [
                 'response' => ['errors' => ["User with ID $id already blocked"]]
+            ]
+        ));
+    }
+
+    public function testSetTempBlockedUsersWithValidData(): void
+    {
+        $response = $this->http->request(
+            'POST',
+            '/api/users/temp-blocked/',
+            [
+                'form_params' => [
+                    'user_id' => $this->validUserId
+                ]
+            ]
+        );
+        $tempBlocked = new TempBlockedUsers();
+        $tempBlocked->delete($this->validUserId);
+        $this->assertJsonStringEqualsJsonString($response->getBody()->getContents(), json_encode(
+            [
+                'response' => 'The user was placed in temporarily blocked.'
+            ]
+        ));
+    }
+
+    public function testDestroyTemporaryBlockingUserWithInvalidUserId(): void
+    {
+        $response = $this->http->request(
+            'DELETE',
+            '/api/users/temp-blocked/' . $this->invalidUserId
+        );
+        $this->assertJsonStringEqualsJsonString($response->getBody()->getContents(), json_encode(
+            [
+                'response' => ['errors' => ['User not found']]
+            ]
+        ));
+    }
+
+    public function testDestroyTemporaryBlockingUserWithValidUserId(): void
+    {
+        $tempBlocked = new TempBlockedUsers();
+        $tempBlocked->save($this->validUserId);
+        $response = $this->http->request(
+            'DELETE',
+            '/api/users/temp-blocked/' . $this->validUserId
+        );
+        $this->assertJsonStringEqualsJsonString($response->getBody()->getContents(), json_encode(
+            [
+                'response' => 'The user has been removed from the temporarily blocked list.'
+            ]
+        ));
+    }
+
+    public function testDestroyWithInvalidUserId(): void
+    {
+        $response = $this->http->request(
+            'DELETE',
+            '/api/users/' . $this->invalidUserId
+        );
+        $this->assertJsonStringEqualsJsonString($response->getBody()->getContents(), json_encode(
+            [
+                'response' => ['errors' => ['User not found']]
+            ]
+        ));
+    }
+
+    public function testDestroyWithValidUserId(): void
+    {
+        $user = new User();
+        $user->save('php-unit@net.net', '12345678');
+        $id = $user->getByEmail('php-unit@net.net')[0];
+        $response = $this->http->request(
+            'DELETE',
+            '/api/users/' . $id
+        );
+        $this->assertJsonStringEqualsJsonString($response->getBody()->getContents(), json_encode(
+            [
+                'response' => 'User deleted.'
             ]
         ));
     }

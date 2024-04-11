@@ -2,6 +2,7 @@
 
 namespace Tests\ControllersTests;
 
+use Controllers\EntityController;
 use PHPUnit\Framework\TestCase;
 use GuzzleHttp\Client;
 
@@ -26,6 +27,14 @@ class EntityControllerTest extends TestCase
         $this->validTarget = NULL;
         $this->invalidTarget = NULL;
         $this->offset = NULL;
+    }
+
+    public function testCreateEntityController(): void
+    {
+        $this->assertContainsOnlyInstancesOf(
+            EntityController::class,
+            [new EntityController]
+        );
     }
 
     public function testIndexWithInvalidTarget(): void

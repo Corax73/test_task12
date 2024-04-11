@@ -4,6 +4,7 @@ namespace Tests\ControllersTests;
 
 require_once 'config/const.php';
 
+use Controllers\AuthController;
 use PHPUnit\Framework\TestCase;
 use GuzzleHttp\Client;
 use Models\User;
@@ -54,6 +55,14 @@ class AuthControllerTest extends TestCase
         $this->invalidCredentials = NULL;
         $this->invalidRegData = NULL;
         $this->invalidRegData = NULL;
+    }
+
+    public function testCreateAuthController(): void
+    {
+        $this->assertContainsOnlyInstancesOf(
+            AuthController::class,
+            [new AuthController]
+        );
     }
 
     public function testLoginWithInvalidCredentials(): void

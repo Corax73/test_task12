@@ -4,6 +4,7 @@ namespace Tests\ControllersTests;
 
 require_once 'config/const.php';
 
+use Controllers\ServiceController;
 use PHPUnit\Framework\TestCase;
 use GuzzleHttp\Client;
 use Models\User;
@@ -34,6 +35,14 @@ class ServiceControllerTest extends TestCase
         $this->nonExistingCommand = NULL;
         $this->emailEmpoweredUser = NULL;
         $this->emailNonEmpoweredUser = NULL;
+    }
+
+    public function testCreateServiceController(): void
+    {
+        $this->assertContainsOnlyInstancesOf(
+            ServiceController::class,
+            [new ServiceController]
+        );
     }
 
     public function testServiceWithNonExistingCommand(): void
