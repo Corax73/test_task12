@@ -5,7 +5,8 @@
             "Controllers\\": "src/Controllers/",
             "Service\\": "src/Service/",
             "Enums\\": "src/Enums/",
-            "ControllersTests\\": "tests/ControllersTests/"
+            "ControllersTests\\": "tests/ControllersTests/",
+            "ModelsTests\\": "tests/ModelsTests/"
         }
     },
     "authors": [
