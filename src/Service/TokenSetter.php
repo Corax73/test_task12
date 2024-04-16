@@ -13,16 +13,25 @@ class TokenSetter extends AbstractService
     public function setToken(string $email): bool
     {
         $resp = false;
-        $query = 'UPDATE ' . (new User())->getTable() . ' SET `remember_token` = :remember_token';
+        try {
+            $query = 'UPDATE ' . (new User())->getTable() . ' SET `remember_token` = :remember_token';
 
-        $query .= ' WHERE `email` = ' . "'" . $email . "'";
+            $query .= ' WHERE `email` = ' . "'" . $email . "'";
 
-        $token = uniqid(explode('@', $email)[0]);
-        $params = [
-            ':remember_token' => $token
-        ];
-        $stmt = $this->connect->connect(PATH_CONF)->prepare($query);
-        $resp = $stmt->execute($params);
+            $token = uniqid(explode('@', $email)[0]);
+            $params = [
+                ':remember_token' => $token
+            ];
+            $stmt = $this->connect->connect(PATH_CONF)->prepare($query);
+            $this->connect->connect(PATH_CONF)->beginTransaction();
+            $resp = $stmt->execute($params);
+            $this->connect->connect(PATH_CONF)->commit();
+        } catch (\Exception $e) {
+            if ($this->connect->connect(PATH_CONF)->inTransaction()) {
+                $this->connect->connect(PATH_CONF)->rollback();
+            }
+            throw $e;
+        }
         return $resp;
     }
 }

@@ -25,14 +25,23 @@ class GroupRights extends AbstractModel
         $resp = false;
         $strFields = implode(', ', $this->fillable);
         if ($strFields) {
-            $query = 'INSERT INTO `' . $this->table . '` (' . $strFields . ', created_at) VALUES (:group_id, :right_name, :now)';
-            $params = [
-                ':group_id' => $group_id,
-                ':right_name' => $right,
-                ':now' => date('Y-m-d h:i:s', time())
-            ];
-            $stmt = $this->connect->connect(PATH_CONF)->prepare($query);
-            $resp = $stmt->execute($params);
+            try {
+                $query = 'INSERT INTO `' . $this->table . '` (' . $strFields . ', created_at) VALUES (:group_id, :right_name, :now)';
+                $params = [
+                    ':group_id' => $group_id,
+                    ':right_name' => $right,
+                    ':now' => date('Y-m-d h:i:s', time())
+                ];
+                $stmt = $this->connect->connect(PATH_CONF)->prepare($query);
+                $this->connect->connect(PATH_CONF)->beginTransaction();
+                $resp = $stmt->execute($params);
+                $this->connect->connect(PATH_CONF)->commit();
+            } catch (\Exception $e) {
+                if ($this->connect->connect(PATH_CONF)->inTransaction()) {
+                    $this->connect->connect(PATH_CONF)->rollback();
+                }
+                throw $e;
+            }
         }
         return $resp;
     }
@@ -63,13 +72,23 @@ class GroupRights extends AbstractModel
     public function delete(int $group_id, string $right): bool
     {
         $resp = false;
-        $query = 'DELETE FROM `' . $this->table . '` WHERE `group_id` = :group_id AND `right_name` = :right';
-        $params = [
-            ':group_id' => $group_id,
-            ':right' => $right
-        ];
-        $stmt = $this->connect->connect(PATH_CONF)->prepare($query);
-        $resp = $stmt->execute($params);
+        try {
+            $query = 'DELETE FROM `' . $this->table . '` WHERE `group_id` = :group_id AND `right_name` = :right';
+            $params = [
+                ':group_id' => $group_id,
+                ':right' => $right
+            ];
+            $stmt = $this->connect->connect(PATH_CONF)->prepare($query);
+            $this->connect->connect(PATH_CONF)->beginTransaction();
+            $stmt->execute($params);
+            $resp = $stmt->rowCount() > 0 ? true : false;
+            $this->connect->connect(PATH_CONF)->commit();
+        } catch (\Exception $e) {
+            if ($this->connect->connect(PATH_CONF)->inTransaction()) {
+                $this->connect->connect(PATH_CONF)->rollback();
+            }
+            throw $e;
+        }
         return $resp;
     }
 }

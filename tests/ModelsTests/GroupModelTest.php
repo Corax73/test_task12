@@ -75,4 +75,19 @@ class GroupModelTest extends TestCase
         $idGroupWithRights = $groupRights->all(1)[0]['group_id'];
         $this->assertTrue(count($this->group->rights($idGroupWithRights)) > 0);
     }
+
+    public function testUsersWithInvalidGroupId(): void
+    {
+        $this->assertTrue(count($this->group->users($this->invalidGroupId)) == 0);
+    }
+
+    public function testUsersWithValidGroupId(): void
+    {
+        $this->assertTrue(count($this->group->users($this->validGroupId)) > 0);
+    }
+
+    public function testDeleteWithInvalidGroupId(): void
+    {
+        $this->assertFalse($this->group->delete($this->invalidGroupId));
+    }
 }
