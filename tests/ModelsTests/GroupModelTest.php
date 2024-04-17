@@ -24,9 +24,11 @@ class GroupModelTest extends TestCase
     protected function tearDown(): void
     {
         $this->group = NULL;
+        $this->invalidGroupId = NULL;
+        $this->validGroupId = NULL;
     }
 
-    public function testCreateConnect(): void
+    public function testCreateGroup(): void
     {
         $this->assertContainsOnlyInstancesOf(
             Group::class,
@@ -89,5 +91,15 @@ class GroupModelTest extends TestCase
     public function testDeleteWithInvalidGroupId(): void
     {
         $this->assertFalse($this->group->delete($this->invalidGroupId));
+    }
+
+    public function testGetByTitleWithInvalidTitle(): void
+    {
+        $this->assertFalse(count($this->group->getByTitle('php-unit')) > 0);
+    }
+
+    public function testGetByTitleWithValidTitle(): void
+    {
+        $this->assertTrue(count($this->group->getByTitle($this->group->find($this->validGroupId)[0]['title'])) > 0);
     }
 }
