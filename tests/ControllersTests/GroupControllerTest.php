@@ -8,6 +8,8 @@ use Controllers\GroupController;
 use PHPUnit\Framework\TestCase;
 use GuzzleHttp\Client;
 use Models\Group;
+use Models\User;
+use Models\UserMembership;
 
 class GroupControllerTest extends TestCase
 {
@@ -84,6 +86,9 @@ class GroupControllerTest extends TestCase
     {
         $group = new Group();
         $group_id = $group->all(1)[0]['id'];
+        $userMembership = new UserMembership();
+        $user = new User();
+        $userMembership->save($user->all(1)[0]['id'], $group_id);
         $response = $this->http->request(
             'GET',
             '/api/groups/users/' . $group_id

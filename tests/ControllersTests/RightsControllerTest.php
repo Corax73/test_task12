@@ -116,7 +116,8 @@ class RightsControllerTest extends TestCase
     public function testCreateWithEstablishedRight(): void
     {
         $group_id = $this->group->all(1)[0]['id'];
-        $right = collect($this->groupRights->getRights($group_id))->unique()->collapse()->values()->toArray()[0];
+        $right = $this->existingRight[0];
+        $this->groupRights->save($group_id, $right);
         $response = $this->http->request(
             'POST',
             '/api/rights/groups/',
@@ -127,6 +128,7 @@ class RightsControllerTest extends TestCase
                 ]
             ]
         );
+        $this->groupRights->delete($group_id, $right);
         $this->assertJsonStringEqualsJsonString($response->getBody()->getContents(), json_encode(['response' => ['errors' => "Right $right already available"]]));
     }
 
@@ -154,7 +156,7 @@ class RightsControllerTest extends TestCase
     public function testDestroyWithInValidGroupId(): void
     {
         $group_id = $this->group->all(1)[0]['id'];
-        $right = collect($this->groupRights->getRights($group_id))->unique()->collapse()->values()->toArray()[0];
+        $right = $this->groupRights->all(1)[0]['right_name'];
         $group_id = 0;
         $response = $this->http->request(
             'DELETE',
@@ -177,12 +179,13 @@ class RightsControllerTest extends TestCase
     public function testDestroyWithValidData(): void
     {
         $group_id = $this->group->all(1)[0]['id'];
-        $establishedRights = collect($this->groupRights->getRights($group_id))->unique()->collapse()->values()->toArray();
+        $right = $this->existingRight[0];
+        $this->groupRights->save($group_id, $right);
         $response = $this->http->request(
             'DELETE',
-            '/api/rights/groups/' . $group_id . '/' . $establishedRights[0]
+            '/api/rights/groups/' . $group_id . '/' . $right
         );
-        $this->groupRights->save($group_id, $establishedRights[0]);
+        $this->groupRights->save($group_id, $right);
         $this->assertJsonStringEqualsJsonString($response->getBody()->getContents(), json_encode(['response' => 'group right removed']));
     }
 

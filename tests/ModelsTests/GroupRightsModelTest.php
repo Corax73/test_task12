@@ -57,6 +57,7 @@ class GroupRightsModelTest extends TestCase
 
     public function testGetRightsWithValidGroupId(): void
     {
+        $this->groupRights->save($this->validGroupId, 'php-unit');
         $this->assertTrue(count($this->groupRights->getRights($this->validGroupId)) > 0);
     }
 

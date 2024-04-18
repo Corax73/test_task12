@@ -206,11 +206,12 @@ class UserControllerTest extends TestCase
 
     public function testDestroyUserMembershipWithValidData(): void
     {
+        $userMembership = new UserMembership();
+        $userMembership->save($this->validUserId, $this->validGroupId);
         $response = $this->http->request(
             'DELETE',
             '/api/users/membership/' . $this->validUserId . '/' . $this->validGroupId
         );
-        $userMembership = new UserMembership();
         $userMembership->save($this->validUserId, $this->validGroupId);
         $this->assertJsonStringEqualsJsonString($response->getBody()->getContents(), json_encode(
             [
