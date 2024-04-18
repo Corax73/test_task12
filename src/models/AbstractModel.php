@@ -49,6 +49,7 @@ abstract class AbstractModel
                 ':id' => $id
             ];
         }
+        $query .= ' ORDER BY `id` DESC';
         $stmt = $this->connect->connect(PATH_CONF)->prepare($query);
         $stmt->execute($params);
         $resp = $stmt->fetchAll(PDO::FETCH_ASSOC);
@@ -63,7 +64,7 @@ abstract class AbstractModel
      */
     public function all(int $limit = 12, int $offset = 0): array
     {
-        $query = 'SELECT * FROM `' . $this->table . '` LIMIT :limit';
+        $query = 'SELECT * FROM `' . $this->table . '` ORDER BY `id` DESC LIMIT :limit';
         if ($offset) {
             $query .= ' OFFSET :offset';
         }
