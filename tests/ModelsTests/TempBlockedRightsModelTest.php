@@ -24,7 +24,7 @@ class TempBlockedRightsModelTest extends TestCase
         $this->testRight = NULL;
     }
 
-    public function testCreateGroupRights(): void
+    public function testCreateTempBlockedRights(): void
     {
         $this->assertContainsOnlyInstancesOf(
             TempBlockedRights::class,
@@ -41,8 +41,8 @@ class TempBlockedRightsModelTest extends TestCase
     {
         $this->tempBlockedRights->save($this->testRight);
         $data = $this->tempBlockedRights->all(1)[0];
-        $this->tempBlockedRights->delete('php-unit');
-        $this->assertTrue(count($data) > 0 && in_array('php-unit', $data));
+        $this->tempBlockedRights->delete($this->testRight);
+        $this->assertTrue(count($data) > 0 && in_array($this->testRight, $data));
     }
 
     public function testDeleteWithInvalidRight(): void
