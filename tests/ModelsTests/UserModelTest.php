@@ -4,6 +4,7 @@ namespace Tests\ModelsTests;
 
 require_once 'config/const.php';
 
+use Models\GroupRights;
 use Models\User;
 use PHPUnit\Framework\TestCase;
 
@@ -55,12 +56,45 @@ class UserModelTest extends TestCase
         $this->assertTrue(count($data) > 0 && in_array($this->testEmail, $data));
     }
 
-    public function testDeleteWithInvalidRight(): void
+    public function testAuthWithInvalidCredentials(): void
+    {
+        $this->assertFalse($this->user->authUser($this->testEmail, $this->testPassword));
+    }
+
+    public function testAuthWithValidCredentials(): void
+    {
+        $this->user->save($this->testEmail, $this->testPassword);
+        $id = $this->user->getByEmail($this->testEmail)[0];
+        $this->assertTrue($this->user->authUser($this->testEmail, $this->testPassword));
+        $this->user->delete($id);
+    }
+
+    public function testGetTokenWithInvalidEmail(): void
+    {
+        $this->assertEquals($this->user->getToken($this->testEmail), 'error');
+    }
+
+    public function testGetRightsWithInvalidId(): void
+    {
+        $this->assertFalse(count($this->user->getRights($this->invalidUserId)) > 0);
+    }
+
+    public function testGetRightsByEmailWithInvalidEmail(): void
+    {
+        $this->assertFalse(count($this->user->getRightsByEmail($this->testEmail)) > 0);
+    }
+
+    public function testGetByEmailWithInvalidEmail(): void
+    {
+        $this->assertFalse(count($this->user->getByEmail($this->testEmail)) > 0);
+    }
+
+    public function testDeleteWithInvalidId(): void
     {
         $this->assertFalse($this->user->delete($this->invalidUserId));
     }
 
-    public function testDeleteWithValidRight(): void
+    public function testDeleteWithValidId(): void
     {
         $this->user->save($this->testEmail, $this->testPassword);
         $id = $this->user->getByEmail($this->testEmail)[0];
