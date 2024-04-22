@@ -4,7 +4,6 @@ namespace Tests\ModelsTests;
 
 require_once 'config/const.php';
 
-use Models\GroupRights;
 use Models\User;
 use PHPUnit\Framework\TestCase;
 
@@ -14,7 +13,6 @@ class UserModelTest extends TestCase
     private $testEmail;
     private $testPassword;
     private $invalidUserId;
-    private $validUserId;
 
     protected function setUp(): void
     {
@@ -22,7 +20,6 @@ class UserModelTest extends TestCase
         $this->testEmail = 'phpunit@mail.php';
         $this->testPassword = '12345678';
         $this->invalidUserId = 0;
-        $this->validUserId = $this->user->all(1)[0]['id'];
     }
 
     protected function tearDown(): void
@@ -31,7 +28,6 @@ class UserModelTest extends TestCase
         $this->testEmail = NULL;
         $this->testPassword = NULL;
         $this->invalidUserId = NULL;
-        $this->validUserId = NULL;
     }
 
     public function testCreateUser(): void
