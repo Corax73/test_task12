@@ -18,7 +18,10 @@ class RequestDataCheckServiceTest extends TestCase
     private $invalidShortPassword;
     private $invalidSymbolsInPassword;
     private $validPassword;
-
+    private $nonExistentGroupTitle;
+    private $existingGroupTitle;
+    private $nonExistentEntity;
+    private $existingEntity;
     protected function setUp(): void
     {
         $this->requestDataCheck = new RequestDataCheck();
@@ -28,6 +31,11 @@ class RequestDataCheckServiceTest extends TestCase
         $this->invalidShortPassword = '123';
         $this->invalidSymbolsInPassword = '123abcd?';
         $this->validPassword = '1234Abcd';
+        $this->nonExistentGroupTitle = 'php-unit';
+        $group = new Group();
+        $this->existingGroupTitle = $group->all(1)[0]['title'];
+        $this->nonExistentEntity = 'php-unit';
+        $this->existingEntity = 'user';
     }
 
     protected function tearDown(): void
@@ -38,6 +46,10 @@ class RequestDataCheckServiceTest extends TestCase
         $this->invalidShortPassword = NULL;
         $this->invalidSymbolsInPassword = NULL;
         $this->validPassword = NULL;
+        $this->nonExistentGroupTitle = NULL;
+        $this->existingGroupTitle = NULL;
+        $this->nonExistentEntity = NULL;
+        $this->existingEntity = NULL;
     }
 
     public function testCreateGroup(): void
@@ -48,12 +60,12 @@ class RequestDataCheckServiceTest extends TestCase
         );
     }
 
-    public function testCheckEmailUniquenessWithInvalidEmail(): void
+    public function testCheckEmailUniquenessWithNonExistentEmail(): void
     {
         $this->assertTrue($this->requestDataCheck->checkEmailUniqueness($this->nonExistentEmail));
     }
 
-    public function testCheckEmailUniquenessWithValidEmail(): void
+    public function testCheckEmailUniquenessWithExistingEmail(): void
     {
         $this->assertFalse($this->requestDataCheck->checkEmailUniqueness($this->existingEmail));
     }
@@ -71,5 +83,25 @@ class RequestDataCheckServiceTest extends TestCase
     public function testCheckingPasswordWithValidPassword(): void
     {
         $this->assertTrue($this->requestDataCheck->checkingPassword($this->validPassword));
+    }
+
+    public function testCheckGroupTitleUniquenessWithNonExistentGroupTitle(): void
+    {
+        $this->assertTrue($this->requestDataCheck->checkGroupTitleUniqueness($this->nonExistentGroupTitle));
+    }
+
+    public function testCheckGroupTitleUniquenessWithExistingGroupTitle(): void
+    {
+        $this->assertFalse($this->requestDataCheck->checkGroupTitleUniqueness($this->existingGroupTitle));
+    }
+
+    public function testCheckEntityExistWithNonExistentEntity(): void
+    {
+        $this->assertFalse($this->requestDataCheck->checkEntityExist($this->nonExistentEntity));
+    }
+
+    public function testCheckEntityExistWithExistingEntity(): void
+    {
+        $this->assertTrue($this->requestDataCheck->checkEntityExist($this->existingEntity));
     }
 }
