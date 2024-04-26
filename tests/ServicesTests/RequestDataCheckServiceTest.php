@@ -7,6 +7,7 @@ require_once 'config/const.php';
 use Models\Group;
 use Models\GroupRights;
 use Models\User;
+use Models\UserMembership;
 use PHPUnit\Framework\TestCase;
 use Service\RequestDataCheck;
 
@@ -22,6 +23,14 @@ class RequestDataCheckServiceTest extends TestCase
     private $existingGroupTitle;
     private $nonExistentEntity;
     private $existingEntity;
+    private $invalidGroupId;
+    private $validGroupId;
+    private $existingRight;
+    private $nonExistentRight;
+    private $validGroupIdFromUserMembership;
+    private $validUserIdFromUserMembership;
+    private $invalidUserId;
+
     protected function setUp(): void
     {
         $this->requestDataCheck = new RequestDataCheck();
@@ -36,6 +45,17 @@ class RequestDataCheckServiceTest extends TestCase
         $this->existingGroupTitle = $group->all(1)[0]['title'];
         $this->nonExistentEntity = 'php-unit';
         $this->existingEntity = 'user';
+        $this->invalidGroupId = 0;
+        $groupRights = new GroupRights();
+        $data = $groupRights->all(1)[0];
+        $this->validGroupId = $data['group_id'];
+        $this->existingRight = $data['right_name'];
+        $this->nonExistentRight = $data['right_name'] . '1';
+        $userMembership = new UserMembership();
+        $data = $userMembership->all(1)[0];
+        $this->validGroupIdFromUserMembership = $data['group_id'];
+        $this->validUserIdFromUserMembership = $data['user_id'];
+        $this->invalidUserId = 0;
     }
 
     protected function tearDown(): void
@@ -50,6 +70,13 @@ class RequestDataCheckServiceTest extends TestCase
         $this->existingGroupTitle = NULL;
         $this->nonExistentEntity = NULL;
         $this->existingEntity = NULL;
+        $this->invalidGroupId = NULL;
+        $this->validGroupId = NULL;
+        $this->existingRight = NULL;
+        $this->nonExistentRight = NULL;
+        $this->validGroupIdFromUserMembership = NULL;
+        $this->validUserIdFromUserMembership = NULL;
+        $this->invalidUserId = NULL;
     }
 
     public function testCreateGroup(): void
@@ -103,5 +130,35 @@ class RequestDataCheckServiceTest extends TestCase
     public function testCheckEntityExistWithExistingEntity(): void
     {
         $this->assertTrue($this->requestDataCheck->checkEntityExist($this->existingEntity));
+    }
+
+    public function testCheckGroupHasRightWithInvalidGroupId(): void
+    {
+        $this->assertFalse($this->requestDataCheck->checkGroupHasRight($this->invalidGroupId, $this->existingRight));
+    }
+
+    public function testCheckGroupHasRightWithValidGroupId(): void
+    {
+        $this->assertTrue($this->requestDataCheck->checkGroupHasRight($this->validGroupId, $this->existingRight));
+    }
+
+    public function testCheckGroupHasRightWithNonExistentRight(): void
+    {
+        $this->assertFalse($this->requestDataCheck->checkGroupHasRight($this->validGroupId, $this->nonExistentRight));
+    }
+
+    public function testCheckGroupHasUserWithInvalidGroupId(): void
+    {
+        $this->assertFalse($this->requestDataCheck->checkGroupHasUser($this->invalidGroupId, $this->validUserIdFromUserMembership));
+    }
+
+    public function testCheckGroupHasUserWithValidGroupId(): void
+    {
+        $this->assertTrue($this->requestDataCheck->checkGroupHasUser($this->validGroupIdFromUserMembership, $this->validUserIdFromUserMembership));
+    }
+
+    public function testCheckGroupHasUserWithInvalidUserId(): void
+    {
+        $this->assertFalse($this->requestDataCheck->checkGroupHasUser($this->validGroupId, $this->invalidUserId));
     }
 }
