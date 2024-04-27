@@ -6,6 +6,8 @@ require_once 'config/const.php';
 
 use Models\Group;
 use Models\GroupRights;
+use Models\TempBlockedRights;
+use Models\TempBlockedUsers;
 use Models\User;
 use Models\UserMembership;
 use PHPUnit\Framework\TestCase;
@@ -30,6 +32,8 @@ class RequestDataCheckServiceTest extends TestCase
     private $validGroupIdFromUserMembership;
     private $validUserIdFromUserMembership;
     private $invalidUserId;
+    private $validUserIdForTempBlocked;
+    private $validRightName;
 
     protected function setUp(): void
     {
@@ -56,6 +60,10 @@ class RequestDataCheckServiceTest extends TestCase
         $this->validGroupIdFromUserMembership = $data['group_id'];
         $this->validUserIdFromUserMembership = $data['user_id'];
         $this->invalidUserId = 0;
+        $tempBlockedUsers = new TempBlockedUsers();
+        $this->validUserIdForTempBlocked = $tempBlockedUsers->all(1)[0]['user_id'];
+        $tempBlockedRights = new TempBlockedRights();
+        $this->validRightName = $tempBlockedRights->all(1)[0]['right_name'];
     }
 
     protected function tearDown(): void
@@ -77,6 +85,8 @@ class RequestDataCheckServiceTest extends TestCase
         $this->validGroupIdFromUserMembership = NULL;
         $this->validUserIdFromUserMembership = NULL;
         $this->invalidUserId = NULL;
+        $this->validUserIdForTempBlocked = NULL;
+        $this->validRightName = NULL;
     }
 
     public function testCreateGroup(): void
@@ -160,5 +170,25 @@ class RequestDataCheckServiceTest extends TestCase
     public function testCheckGroupHasUserWithInvalidUserId(): void
     {
         $this->assertFalse($this->requestDataCheck->checkGroupHasUser($this->validGroupId, $this->invalidUserId));
+    }
+
+    public function testCheckUserBlockWithInvalidUserId(): void
+    {
+        $this->assertFalse($this->requestDataCheck->checkUserBlock($this->invalidUserId));
+    }
+
+    public function testCheckUserBlockWithValidUserId(): void
+    {
+        $this->assertTrue($this->requestDataCheck->checkUserBlock($this->validUserIdForTempBlocked));
+    }
+
+    public function testCheckRightBlockWithNonExistentRight(): void
+    {
+        $this->assertFalse($this->requestDataCheck->checkRightBlock($this->nonExistentRight));
+    }
+
+    public function testCheckRightBlockWithValidRightName(): void
+    {
+        $this->assertTrue($this->requestDataCheck->checkRightBlock($this->validRightName));
     }
 }
