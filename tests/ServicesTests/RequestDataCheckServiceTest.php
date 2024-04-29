@@ -89,7 +89,7 @@ class RequestDataCheckServiceTest extends TestCase
         $this->validRightName = NULL;
     }
 
-    public function testCreateGroup(): void
+    public function testRequestDataCheck(): void
     {
         $this->assertContainsOnlyInstancesOf(
             RequestDataCheck::class,

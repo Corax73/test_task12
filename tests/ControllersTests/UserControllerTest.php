@@ -242,12 +242,9 @@ class UserControllerTest extends TestCase
     {
         $tempBlocked = new TempBlockedUsers();
         $id = $tempBlocked->all(1);
-        if ($id) {
-            $id = $id[0]['user_id'];
-        } else {
-            $tempBlocked->save($this->validUserId);
-            $id = $this->validUserId;
-        }
+
+        $tempBlocked->save($this->validUserId);
+        $id = $this->validUserId;
         $response = $this->http->request(
             'POST',
             '/api/users/temp-blocked/',
