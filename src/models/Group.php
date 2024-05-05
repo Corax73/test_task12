@@ -45,7 +45,7 @@ class Group extends AbstractModel
     /**
      * Returns an array of its rights received from the Group model by ID, if available.
      * @param int $id
-     * @return array
+     * @return array<int, string>
      */
     public function rights(int $id): array
     {
@@ -58,7 +58,7 @@ class Group extends AbstractModel
     /**
      * Returns an array ID of group users.
      * @param int $group_id
-     * @return array
+     * @return array<int, int>
      */
     public function users(int $group_id): array
     {
@@ -98,7 +98,7 @@ class Group extends AbstractModel
     /**
      * Returns an array of group fields by its title.
      * @param string $title
-     * @return array
+     * @return array<int, mixed>
      */
     public function getByTitle(string $title): array
     {

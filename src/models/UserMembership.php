@@ -48,7 +48,7 @@ class UserMembership extends AbstractModel
     /**
      * Loading data by user_id.
      * @param int $user_id
-     * @return string
+     * @return array<string, int>
      */
     public function memberships(int $user_id): array
     {
@@ -65,9 +65,9 @@ class UserMembership extends AbstractModel
     /**
      * Loading data by group_id.
      * @param int $group_id
-     * @return string
+     * @return array<int, int>
      */
-    public function users(int $group_id)
+    public function users(int $group_id): array
     {
         $query = 'SELECT `user_id` FROM ' . $this->table . ' WHERE `group_id` = :group_id';
         $params = [
@@ -75,7 +75,7 @@ class UserMembership extends AbstractModel
         ];
         $stmt = $this->connect->connect(PATH_CONF)->prepare($query);
         $stmt->execute($params);
-        $usersIds = collect($stmt->fetchAll(PDO::FETCH_ASSOC))->map(fn ($item) => $item['user_id'])->toArray();
+        $usersIds = collect($stmt->fetchAll(PDO::FETCH_ASSOC))->pluck('user_id')->toArray();
         return $usersIds;
     }
 

@@ -20,7 +20,7 @@ abstract class AbstractController
         $this->response = new Response($this->request);
     }
 
-    public function setCors()
+    public function setCors(): void
     {
         $this->response->header('Access-Control-Allow-Origin: *');
         $this->response->header('Access-Control-Request-Method: OPTIONS');

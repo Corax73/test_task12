@@ -7,7 +7,6 @@ use Service\RequestDataCheck;
 
 /**
  * @property string $table
- * @property array $fillable
  */
 class User extends AbstractModel
 {
@@ -104,7 +103,7 @@ class User extends AbstractModel
     /**
      * Returns an array of user rights by his ID through a subquery of group membership.
      * @param int $id
-     * @return array
+     * @return array<string, string>
      */
     public function getRights(int $id): array
     {
@@ -129,7 +128,7 @@ class User extends AbstractModel
     /**
      * Returns an array with the user's rights by his email.
      * @param string $email
-     * @return array
+     * @return array<int, mixed>
      */
     public function getRightsByEmail(string $email): array
     {
@@ -176,7 +175,7 @@ class User extends AbstractModel
     /**
      * Returns an array of user fields by his email.
      * @param string $email
-     * @return array
+     * @return array<int, mixed>
      */
     public function getByEmail(string $email): array
     {

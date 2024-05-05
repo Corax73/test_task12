@@ -49,7 +49,7 @@ class GroupRights extends AbstractModel
     /**
      * Loading data by group_id.
      * @param int $group_id
-     * @return string
+     * @return array<int, string>
      */
     public function getRights(int $group_id): array
     {
@@ -65,8 +65,8 @@ class GroupRights extends AbstractModel
 
     /**
      * Removes a right in a group.
-     * @param int $groupId
-     * @param string $rightName
+     * @param int $group_id
+     * @param string $right
      * @return bool
      */
     public function delete(int $group_id, string $right): bool

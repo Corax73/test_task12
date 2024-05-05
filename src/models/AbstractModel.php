@@ -6,15 +6,21 @@ use Models\Connect;
 use PDO;
 
 /**
- * @property protected string $table
- * @property protected array $fillable;
- * @property protected array $guarded;
+ * @property string $table
+ * @property array $fillable;
+ * @property array $guarded;
  * @property Connect $connect
  */
 abstract class AbstractModel
 {
     protected string $table;
+    /**
+     * @var array<string>
+     */
     protected array $fillable;
+     /**
+     * @var array<string>
+     */
     protected array $guarded;
     protected Connect $connect;
 
@@ -34,8 +40,8 @@ abstract class AbstractModel
 
     /**
      * Searches by model ID. Returns an array with data or false.
-     * @param int|array $id
-     * @return array | bool
+     * @param int|array<int, int> $id
+     * @return array<string, mixed> | bool
      */
     public function find(int|array $id): array | bool
     {
@@ -60,7 +66,7 @@ abstract class AbstractModel
      * Returns an array of all model entries.
      * @param int $limit
      * @param int $offset
-     * @return array
+     * @return array<string, mixed>
      */
     public function all(int $limit = 12, int $offset = 0): array
     {
